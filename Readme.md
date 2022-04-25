@@ -1,7 +1,7 @@
 # Проект «Киноман»
 
 * Студент: [Nick Braun](https://up.htmlacademy.ru/ecmascript/17/user/1678643).
-* Наставник: `Неизвестно`.
+* Наставник: [Sergey Vohmyanin](https://github.com/delagen).
 
 ---
 
