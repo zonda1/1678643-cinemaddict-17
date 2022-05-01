@@ -1,7 +1,10 @@
 /* eslint-disable quotes */
 import {createElement} from '../render.js';
 
-const createNewFilterTemplate = () => `<section class="film-details">
+const createNewPopupTemplate = (feature) => {
+  const {title,posters, description, runtime, genre} = feature.filmInfo;
+
+  return (`<section class="film-details">
 <form class="film-details__inner" action="" method="get">
   <div class="film-details__top-container">
     <div class="film-details__close">
@@ -164,11 +167,16 @@ const createNewFilterTemplate = () => `<section class="film-details">
     </section>
   </div>
 </form>
-</section>`;
+</section>`);};
 
 export class NewPopupView {
+
+  constructor(feature) {
+    this.feature = feature;
+  }
+
   getTemplate() {
-    return createNewFilterTemplate();
+    return createNewPopupTemplate(this.feature);
   }
 
   getElement() {
