@@ -19,7 +19,7 @@ const filmTitleToUrl={
   'Santa claus conquers the martians':'./images/posters/santa-claus-conquers-the-martians.jpg',
   'The dance of life':'./images/posters/the-dance-of-life.jpg',
   'The great flamarion':'./images/posters/the-great-flamarion.jpg',
-  'The man with the golden-arm':'./images/posters/the-man-with-the-golden-arm.jpg',
+  'The man with the golden arm':'./images/posters/the-man-with-the-golden-arm.jpg',
 };
 
 const generateFilmTitles = () => {
@@ -32,8 +32,8 @@ const generateFilmTitles = () => {
 
 export const generateFilmFeature = () => {
   const generatedFilmTitle=generateFilmTitles();
+
   return ({
-    // id: '0',
     // comments: [
     //   $Comment.id$, $Comment.id$
     // ],
@@ -69,7 +69,7 @@ export const generateFilmFeature = () => {
   });};
 
 export const generateFilmComments = () => ({
-  // id: '42',
+  id: '1',
   // eslint-disable-next-line quotes
   author: `Ilya O'Reilly`,
   comment: 'a film that changed my life, a true masterpiece, post-credit scene was just amazing omg.',

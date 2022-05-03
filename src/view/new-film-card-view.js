@@ -1,21 +1,13 @@
 import {createElement} from '../render.js';
-import {humanizeTaskDueDate} from '../utils.js';
+import {humanizeOnlyYear} from '../utils.js';
 
 const createNewFilmCardTemplate = (feature) => {
   const {title,posters, description, runtime, genre} = feature.filmInfo;
   const {date}=feature.filmInfo.release;
-  const filmDate=humanizeTaskDueDate(date);
+  const filmDate=humanizeOnlyYear(date);
   const {watchlist,alreadyWatched:watched,favorite}=feature.userDetails;
 
   const isUserDetailActive=(detail)=> detail ? 'film-card__controls-item--active': '';
-
-  // const archiveClassName = isArchive
-  //   ? 'card__btn--archive card__btn--disabled'
-  //   : 'card__btn--archive';
-
-  // const favoriteClassName = isFavorite
-  //   ? 'card__btn--favorites card__btn--disabled'
-  //   : 'card__btn--favorites';
 
   return (`
 <article class="film-card">
