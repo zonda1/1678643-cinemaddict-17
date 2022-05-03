@@ -1,13 +1,12 @@
-import {generateFilmFeature} from '../mock/feature.js';
-import {generateFilmComments} from '../mock/feature.js';
-
 export class FeatureModel {
-  features = Array.from({length: 10}, generateFilmFeature);
-  comments = Array.from({length: 10}, generateFilmComments);
 
-  getComments = () => this.comments;
+  constructor (features,comments) {
+    this.features=features;
+    this.comments=comments;
+  }
+
   getFeatures = () => this.features;
-}
-// export class CommentModel {
+  getComments = () => this.comments;
 
-// }
+  getCommentForFeature=(id)=>this.comments.filter((comment)=>comment.id===id);
+}

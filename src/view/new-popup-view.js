@@ -1,6 +1,6 @@
 /* eslint-disable quotes */
 import {createElement} from '../render.js';
-import {humanizeWholeDate} from '../utils.js';
+import {humanizeWholeDate,humanizeWholeDateWithTime} from '../utils.js';
 
 const createNewPopupTemplate = (feature) => {
   const {title,alternativeTitle,posters, description, runtime, genre,director,writers,actors} = feature.filmInfo;
@@ -8,6 +8,7 @@ const createNewPopupTemplate = (feature) => {
   const filmDate=humanizeWholeDate(date);
   const {watchlist,alreadyWatched:watched,favorite}=feature.userDetails;
   const isUserDetailActive=(detail)=> detail ? 'film-details__control-button--active': '';
+
 
   return (`<section class="film-details">
 <form class="film-details__inner" action="" method="get">
@@ -80,7 +81,7 @@ const createNewPopupTemplate = (feature) => {
 
   <div class="film-details__bottom-container">
     <section class="film-details__comments-wrap">
-      <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">4</span></h3>
+      <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count"></span></h3>
 
       <ul class="film-details__comments-list">
 
@@ -120,39 +121,25 @@ const createNewPopupTemplate = (feature) => {
 </form>
 </section>`);};
 
-const createNewCommentsTemplate=()=>
+const createNewCommentsTemplate=(comments)=>{
+  const {comment,author,date,emotion}=comments;
+  const commentDate=humanizeWholeDateWithTime(date);
 
-  `<li class="film-details__comment">
+  return (`<li class="film-details__comment">
   <span class="film-details__comment-emoji">
-    <img src="./images/emoji/smile.png" width="55" height="55" alt="emoji-smile">
+    <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
   </span>
   <div>
-    <p class="film-details__comment-text">Interesting setting and a good cast</p>
+    <p class="film-details__comment-text">${comment}</p>
     <p class="film-details__comment-info">
-      <span class="film-details__comment-author">Tim Macoveev</span>
-      <span class="film-details__comment-day">2019/12/31 23:59</span>
+      <span class="film-details__comment-author">${author}</span>
+      <span class="film-details__comment-day">${commentDate}</span>
       <button class="film-details__comment-delete">Delete</button>
     </p>
   </div>
 </li>
-`;
-// const createNewCommentsTemplate=(comments)=>{
-//   const {comment}=comments;
+`);};
 
-//   return (`<li class="film-details__comment">
-//   <span class="film-details__comment-emoji">
-//     <img src="./images/emoji/smile.png" width="55" height="55" alt="emoji-smile">
-//   </span>
-//   <div>
-//     <p class="film-details__comment-text">${comment}</p>
-//     <p class="film-details__comment-info">
-//       <span class="film-details__comment-author">Tim Macoveev</span>
-//       <span class="film-details__comment-day">2019/12/31 23:59</span>
-//       <button class="film-details__comment-delete">Delete</button>
-//     </p>
-//   </div>
-// </li>
-// `);};
 export class NewPopupView {
 
   constructor(feature) {

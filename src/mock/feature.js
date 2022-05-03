@@ -29,11 +29,14 @@ const generateFilmTitles = () => {
   return titles[randomIndex];
 };
 
+let currentFilmId=0;
 
 export const generateFilmFeature = () => {
   const generatedFilmTitle=generateFilmTitles();
 
+
   return ({
+    id:currentFilmId++,
     // comments: [
     //   $Comment.id$, $Comment.id$
     // ],
@@ -68,8 +71,8 @@ export const generateFilmFeature = () => {
     }
   });};
 
-export const generateFilmComments = () => ({
-  id: '1',
+export const generateFilmComments = (filmId) => ({
+  id: filmId,
   // eslint-disable-next-line quotes
   author: `Ilya O'Reilly`,
   comment: 'a film that changed my life, a true masterpiece, post-credit scene was just amazing omg.',

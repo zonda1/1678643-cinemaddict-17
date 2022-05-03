@@ -9,5 +9,6 @@ const getRandomInteger = (a = 0, b = 1) => {
 
 const humanizeOnlyYear = (dueDate) => dayjs(dueDate).format('YYYY');
 const humanizeWholeDate = (dueDate) => dayjs(dueDate).format('DD MMMM YYYY');
+const humanizeWholeDateWithTime = (dueDate) => dayjs(dueDate).format('YYYY/MM/DD HH:mm');
 
-export {getRandomInteger, humanizeOnlyYear,humanizeWholeDate};
+export {getRandomInteger, humanizeOnlyYear,humanizeWholeDate,humanizeWholeDateWithTime};

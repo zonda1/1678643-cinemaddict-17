@@ -1,7 +1,7 @@
 import {NewFilmsSectionView} from '../view/new-films-section-view';
-import {NewFilmsListSectionView} from '../view/new-filmsList-section-view';
-import {NewFilmsListContainerView} from '../view/new-filmsContainer-view';
-import {NewButtonView} from '../view/new-showMore-button-view.js';
+import {NewFilmsListSectionView} from '../view/new-films-list-section-view';
+import {NewFilmsListContainerView} from '../view/new-films-container-view';
+import {NewButtonView} from '../view/new-button-view.js';
 import {NewFilmCardView} from '../view/new-film-card-view.js';
 import {render} from '../render.js';
 
@@ -14,7 +14,7 @@ export class BoardPresenter {
     this.boardContainer = boardContainer;
     this.featureModel = featureModel;
     this.boardFeatures = [...this.featureModel.getFeatures()];
-    // console.log(this.boardFeatures);
+
     render(this.filmsSection, this.boardContainer);
     render(this.filmsListSection, this.filmsSection.getElement());
     render(this.filmsListContainer, this.filmsListSection.getElement());
