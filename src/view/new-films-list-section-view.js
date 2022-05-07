@@ -3,19 +3,21 @@ import {createElement} from '../render.js';
 const createNewFilterTemplate = () => '<section class="films-list"></section>';
 
 export class NewFilmsListSectionView {
-  getTemplate() {
+  #element=null;
+
+  get template() {
     return createNewFilterTemplate();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

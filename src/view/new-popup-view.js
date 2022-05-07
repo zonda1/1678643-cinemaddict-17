@@ -141,46 +141,50 @@ const createNewCommentsTemplate=(comments)=>{
 `);};
 
 export class NewPopupView {
+  #element=null;
+  #feature=null;
 
   constructor(feature) {
-    this.feature = feature;
+    this.#feature = feature;
   }
 
-  getTemplate() {
-    return createNewPopupTemplate(this.feature);
+  get template() {
+    return createNewPopupTemplate(this.#feature);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
 export class NewCommentsView {
+  #element=null;
+  #comments=null;
 
   constructor(comments) {
-    this.comments = comments;
+    this.#comments = comments;
   }
 
-  getTemplate() {
-    return createNewCommentsTemplate(this.comments);
+  get template() {
+    return createNewCommentsTemplate(this.#comments);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

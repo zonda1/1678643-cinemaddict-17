@@ -27,7 +27,7 @@ render(new NewFilterView(), siteMainElement);
 render(new NewSortView(), siteMainElement);
 boardPresenter.init(siteMainElement,featureModel);
 
-const popupFeatures = [...featureModel.getFeatures()];
+const popupFeatures = [...featureModel.features];
 const popupComments = featureModel.getCommentForFeature(popupFeatures[0].id);
 
 render(new NewPopupView(popupFeatures[0]), siteBody);

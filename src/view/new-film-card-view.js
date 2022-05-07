@@ -32,23 +32,26 @@ const createNewFilmCardTemplate = (feature) => {
 
 export class NewFilmCardView {
 
+  #element=null;
+  #feature=null;
+
   constructor(feature) {
-    this.feature = feature;
+    this.#feature = feature;
   }
 
-  getTemplate() {
-    return createNewFilmCardTemplate(this.feature);
+  get template() {
+    return createNewFilmCardTemplate(this.#feature);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

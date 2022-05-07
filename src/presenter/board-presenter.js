@@ -4,25 +4,37 @@ import {NewFilmsListContainerView} from '../view/new-films-container-view';
 import {NewButtonView} from '../view/new-button-view.js';
 import {NewFilmCardView} from '../view/new-film-card-view.js';
 import {render} from '../render.js';
-
+import {NewPopupView} from '../view/new-popup-view.js';
 export class BoardPresenter {
+  #boardContainer=null;
+  #featureModel=null;
+  #boardFeatures=[];
+  #popupFeatures=[];
   filmsSection = new NewFilmsSectionView();
   filmsListSection = new NewFilmsListSectionView();
   filmsListContainer = new NewFilmsListContainerView();
 
+  #renderFeature(task) {
+    const featureComponent= new NewFilmCardView(task);
+    // const popupComponent=new NewPopupView();
+    render(featureComponent, this.filmsListContainer.element);
+    // render(popupComponent, siteBody);
+  }
+
   init = (boardContainer,featureModel) => {
-    this.boardContainer = boardContainer;
-    this.featureModel = featureModel;
-    this.boardFeatures = [...this.featureModel.getFeatures()];
 
-    render(this.filmsSection, this.boardContainer);
-    render(this.filmsListSection, this.filmsSection.getElement());
-    render(this.filmsListContainer, this.filmsListSection.getElement());
+    this.#boardContainer = boardContainer;
+    this.#featureModel = featureModel;
+    this.#boardFeatures = [...this.#featureModel.features];
 
-    for (let i = 0; i < this.boardFeatures.length; i++) {
-      render(new NewFilmCardView(this.boardFeatures[i]), this.filmsListContainer.getElement());
+    render(this.filmsSection, this.#boardContainer);
+    render(this.filmsListSection, this.filmsSection.element);
+    render(this.filmsListContainer, this.filmsListSection.element);
+
+    for (let i = 0; i < this.#boardFeatures.length; i++) {
+      this.#renderFeature(this.#boardFeatures[i]);
     }
 
-    render(new NewButtonView(), this.filmsListSection.getElement());
+    render(new NewButtonView(), this.filmsListSection.element);
   };
 }
