@@ -163,6 +163,8 @@ export class NewPopupView {
   removeElement() {
     this.#element = null;
   }
+
+  // get closeButton() {return  document.querySelector('.film-details__close-btn');}
 }
 export class NewCommentsView {
   #element=null;
