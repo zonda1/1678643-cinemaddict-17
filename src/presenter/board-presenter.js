@@ -1,3 +1,5 @@
+import {NewFilterView} from '../view/new-filter-view.js';
+import {NewSortView} from '../view/new-sort-view.js';
 import {NewFilmsSectionView} from '../view/new-films-section-view';
 import {NewFilmsListSectionView} from '../view/new-films-list-section-view';
 import {NewFilmsListContainerView} from '../view/new-films-container-view';
@@ -6,8 +8,11 @@ import {NewFilmCardView} from '../view/new-film-card-view.js';
 import {render} from '../render.js';
 import {NewPopupView} from '../view/new-popup-view.js';
 import {NewCommentsView} from '../view/new-popup-view.js';
+import {NoFeatureView} from '../view/no-feature-view';
 
+const TASK_COUNT_PER_STEP = 5;
 
+const siteMainElement=document.querySelector('.main');
 const siteBody=document.querySelector('body');
 export class BoardPresenter {
   #boardContainer=null;
@@ -16,7 +21,9 @@ export class BoardPresenter {
   filmsSection = new NewFilmsSectionView();
   filmsListSection = new NewFilmsListSectionView();
   filmsListContainer = new NewFilmsListContainerView();
+  #loadMoreButtonComponent = new NewButtonView();
 
+  #renderedFeatureCount = TASK_COUNT_PER_STEP;
 
   init = (boardContainer,featureModel) => {
 
@@ -24,16 +31,41 @@ export class BoardPresenter {
     this.#featureModel = featureModel;
     this.#boardFeatures = [...this.#featureModel.features];
 
-    render(this.filmsSection, this.#boardContainer);
-    render(this.filmsListSection, this.filmsSection.element);
-    render(this.filmsListContainer, this.filmsListSection.element);
+    if (this.#boardFeatures.every((film)=>film.isArchive)) {
+      render(this.filmsSection, this.#boardContainer);
+      render(this.filmsListSection, this.filmsSection.element);
+      render(new NoFeatureView(),this.filmsListSection.element);
+    }
+    else {
+      render(new NewFilterView(), siteMainElement);
+      render(new NewSortView(), siteMainElement);
+      render(this.filmsSection, this.#boardContainer);
+      render(this.filmsListSection, this.filmsSection.element);
+      render(this.filmsListContainer, this.filmsListSection.element);
+    }
 
-
-    for (let i = 0; i < this.#boardFeatures.length; i++) {
+    for (let i = 0; i < Math.min(this.#boardFeatures.length, TASK_COUNT_PER_STEP); i++) {
       this.#renderFeature(this.#boardFeatures[i]);
     }
 
-    render(new NewButtonView(), this.filmsListSection.element);
+    if (this.#boardFeatures.length > TASK_COUNT_PER_STEP) {
+      render(this.#loadMoreButtonComponent, this.filmsListSection.element);
+      this.#loadMoreButtonComponent.element.addEventListener('click', this.#handleLoadMoreButtonClick);
+    }
+  };
+
+  #handleLoadMoreButtonClick = (evt) => {
+    evt.preventDefault();
+    this.#boardFeatures
+      .slice(this.#renderedFeatureCount, this.#renderedFeatureCount + TASK_COUNT_PER_STEP)
+      .forEach((task) => this.#renderFeature(task));
+
+    this.#renderedFeatureCount += TASK_COUNT_PER_STEP;
+
+    if (this.#renderedFeatureCount >= this.#boardFeatures.length) {
+      this.#loadMoreButtonComponent.element.remove();
+      this.#loadMoreButtonComponent.removeElement();
+    }
   };
 
   #renderFeature(task) {
@@ -72,10 +104,7 @@ export class BoardPresenter {
     function onEscKeyDown(evt) {
       if (evt.key === 'Escape' || evt.key === 'Esc') {
         evt.preventDefault();
-        document.querySelector('.film-details').remove();
-        document.body.classList.remove('hide-overflow');
-        document.removeEventListener('keydown', onEscKeyDown);
-        document.removeEventListener('click', onCloseButtonClick);
+        onCloseButtonClick();
       }
     }
   }
