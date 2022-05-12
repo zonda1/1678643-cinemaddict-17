@@ -79,6 +79,20 @@ export class BoardPresenter {
       document.body.classList.add('hide-overflow');
       document.addEventListener('keydown', onEscKeyDown);
       popupComponent.setClickPopupCloser(onCloseButtonClick);
+
+      function onCloseButtonClick() {
+        document.querySelector('.film-details').remove();
+        document.body.classList.remove('hide-overflow');
+        popupComponent.removeClickPopupCloser(onCloseButtonClick);
+        document.removeEventListener('keydown', onEscKeyDown);
+      }
+
+      function onEscKeyDown(evt) {
+        if (evt.key === 'Escape' || evt.key === 'Esc') {
+          evt.preventDefault();
+          onCloseButtonClick();
+        }
+      }
     }
 
     function renderPopupComments(arr) {
@@ -92,19 +106,5 @@ export class BoardPresenter {
       renderPopup();
       renderPopupComments(popupComments);
     });
-
-    function onCloseButtonClick() {
-      document.querySelector('.film-details').remove();
-      document.body.classList.remove('hide-overflow');
-      document.removeEventListener('click', onCloseButtonClick);
-      document.removeEventListener('keydown', onEscKeyDown);
-    }
-
-    function onEscKeyDown(evt) {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        onCloseButtonClick();
-      }
-    }
   }
 }
