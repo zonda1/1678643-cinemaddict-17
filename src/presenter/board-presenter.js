@@ -5,7 +5,7 @@ import {NewFilmsListSectionView} from '../view/new-films-list-section-view';
 import {NewFilmsListContainerView} from '../view/new-films-container-view';
 import {NewButtonView} from '../view/new-button-view.js';
 import {NewFilmCardView} from '../view/new-film-card-view.js';
-import {render} from '../render.js';
+import {render} from '../framework/render.js';
 import {NewPopupView} from '../view/new-popup-view.js';
 import {NewCommentsView} from '../view/new-popup-view.js';
 import {NoFeatureView} from '../view/no-feature-view';
@@ -50,12 +50,11 @@ export class BoardPresenter {
 
     if (this.#boardFeatures.length > TASK_COUNT_PER_STEP) {
       render(this.#loadMoreButtonComponent, this.filmsListSection.element);
-      this.#loadMoreButtonComponent.element.addEventListener('click', this.#handleLoadMoreButtonClick);
+      this.#loadMoreButtonComponent.setClickHandler(this.#handleLoadMoreButtonClick);
     }
   };
 
-  #handleLoadMoreButtonClick = (evt) => {
-    evt.preventDefault();
+  #handleLoadMoreButtonClick = () => {
     this.#boardFeatures
       .slice(this.#renderedFeatureCount, this.#renderedFeatureCount + TASK_COUNT_PER_STEP)
       .forEach((task) => this.#renderFeature(task));
@@ -79,7 +78,7 @@ export class BoardPresenter {
       document.body.append(popupComponent.element);
       document.body.classList.add('hide-overflow');
       document.addEventListener('keydown', onEscKeyDown);
-      popupComponent.element.querySelector('.film-details__close-btn').addEventListener('click', onCloseButtonClick);
+      popupComponent.setClickPopupCloser(onCloseButtonClick);
     }
 
     function renderPopupComments(arr) {
@@ -89,7 +88,7 @@ export class BoardPresenter {
       siteBody.querySelector('.film-details__comments-count').textContent=commentsAmount;
     }
 
-    featureComponent.element.addEventListener('click',()=>{
+    featureComponent.setClickPopupOpener(()=>{
       renderPopup();
       renderPopupComments(popupComments);
     });

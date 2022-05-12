@@ -1,4 +1,4 @@
-import {render} from './render.js';
+import {render} from './framework/render.js';
 import {generateFilmFeature} from './mock/feature.js';
 import {generateFilmComments} from './mock/feature.js';
 import {NewUserLogoView} from './view/new-user-logo-view.js';

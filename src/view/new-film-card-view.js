@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import {humanizeOnlyYear} from '../utils.js';
 
 const createNewFilmCardTemplate = (feature) => {
@@ -30,12 +30,12 @@ const createNewFilmCardTemplate = (feature) => {
 </div>
 </article>`);};
 
-export class NewFilmCardView {
+export class NewFilmCardView extends AbstractView {
 
-  #element=null;
   #feature=null;
 
   constructor(feature) {
+    super();
     this.#feature = feature;
   }
 
@@ -43,15 +43,13 @@ export class NewFilmCardView {
     return createNewFilmCardTemplate(this.#feature);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  setClickPopupOpener = (callback) => {
+    this._callback.click = callback;
+    this.element.addEventListener('click', this.#clickOpenPopupHandler);
+  };
 
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
+  #clickOpenPopupHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 }

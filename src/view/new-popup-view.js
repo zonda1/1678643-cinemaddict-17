@@ -1,5 +1,5 @@
 /* eslint-disable quotes */
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import {humanizeWholeDate,humanizeWholeDateWithTime} from '../utils.js';
 
 const createNewPopupTemplate = (feature) => {
@@ -140,11 +140,12 @@ const createNewCommentsTemplate=(comments)=>{
 </li>
 `);};
 
-export class NewPopupView {
-  #element=null;
+export class NewPopupView extends AbstractView {
+
   #feature=null;
 
   constructor(feature) {
+    super();
     this.#feature = feature;
   }
 
@@ -152,25 +153,28 @@ export class NewPopupView {
     return createNewPopupTemplate(this.#feature);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  setClickPopupCloser = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickClosePopupHandler);
+  };
 
-    return this.#element;
-  }
+  removeClickPopupCloser = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.film-details__close-btn').removeEventListener('click', this.#clickClosePopupHandler);
+  };
 
-  removeElement() {
-    this.#element = null;
-  }
+  #clickClosePopupHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 
-  // get closeButton() {return  document.querySelector('.film-details__close-btn');}
 }
-export class NewCommentsView {
-  #element=null;
+export class NewCommentsView extends AbstractView {
+
   #comments=null;
 
   constructor(comments) {
+    super();
     this.#comments = comments;
   }
 
@@ -178,15 +182,4 @@ export class NewCommentsView {
     return createNewCommentsTemplate(this.#comments);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
 }
