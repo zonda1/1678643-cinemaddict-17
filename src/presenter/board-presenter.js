@@ -4,16 +4,14 @@ import {NewFilmsSectionView} from '../view/new-films-section-view';
 import {NewFilmsListSectionView} from '../view/new-films-list-section-view';
 import {NewFilmsListContainerView} from '../view/new-films-container-view';
 import {NewButtonView} from '../view/new-button-view.js';
-import {NewFilmCardView} from '../view/new-film-card-view.js';
 import {render} from '../framework/render.js';
-import {NewPopupView} from '../view/new-popup-view.js';
-import {NewCommentsView} from '../view/new-popup-view.js';
 import {NoFeatureView} from '../view/no-feature-view';
+import FilmPresenter from './film-presenter';
 
 const TASK_COUNT_PER_STEP = 5;
 
 const siteMainElement=document.querySelector('.main');
-const siteBody=document.querySelector('body');
+
 export class BoardPresenter {
   #boardContainer=null;
   #featureModel=null;
@@ -43,22 +41,34 @@ export class BoardPresenter {
       render(this.filmsListSection, this.filmsSection.element);
       render(this.filmsListContainer, this.filmsListSection.element);
     }
+    this.#renderFeatureList();
+  };
 
-    for (let i = 0; i < Math.min(this.#boardFeatures.length, TASK_COUNT_PER_STEP); i++) {
-      this.#renderFeature(this.#boardFeatures[i]);
-    }
-
+  #renderFeatureList = () => {
+    this.#renderFeatures(0, Math.min(this.#boardFeatures.length, TASK_COUNT_PER_STEP));
     if (this.#boardFeatures.length > TASK_COUNT_PER_STEP) {
-      render(this.#loadMoreButtonComponent, this.filmsListSection.element);
-      this.#loadMoreButtonComponent.setClickHandler(this.#handleLoadMoreButtonClick);
+      this.#renderLoadMoreButton();
     }
   };
 
-  #handleLoadMoreButtonClick = () => {
+  #renderFeatures = (from, to) => {
     this.#boardFeatures
-      .slice(this.#renderedFeatureCount, this.#renderedFeatureCount + TASK_COUNT_PER_STEP)
+      .slice(from, to)
       .forEach((task) => this.#renderFeature(task));
+  };
 
+  #renderFeature(task) {
+    const filmPresenter = new FilmPresenter(this.filmsListContainer.element);
+    filmPresenter.init(task,this.#featureModel,this.#boardFeatures);
+  }
+
+  #renderLoadMoreButton = () => {
+    render(this.#loadMoreButtonComponent, this.filmsListSection.element);
+    this.#loadMoreButtonComponent.setClickHandler(this.#handleLoadMoreButtonClick);
+  };
+
+  #handleLoadMoreButtonClick = () => {
+    this.#renderFeatures(this.#renderedFeatureCount, this.#renderedFeatureCount + TASK_COUNT_PER_STEP);
     this.#renderedFeatureCount += TASK_COUNT_PER_STEP;
 
     if (this.#renderedFeatureCount >= this.#boardFeatures.length) {
@@ -66,45 +76,4 @@ export class BoardPresenter {
       this.#loadMoreButtonComponent.removeElement();
     }
   };
-
-  #renderFeature(task) {
-    const popupComments = this.#featureModel.getCommentForFeature(this.#boardFeatures[0].id);
-    const commentsAmount=popupComments.length;
-    const featureComponent= new NewFilmCardView(task);
-    render(featureComponent, this.filmsListContainer.element);
-
-    function renderPopup() {
-      const popupComponent=new NewPopupView(task);
-      document.body.append(popupComponent.element);
-      document.body.classList.add('hide-overflow');
-      document.addEventListener('keydown', onEscKeyDown);
-      popupComponent.setClickPopupCloser(onCloseButtonClick);
-
-      function onCloseButtonClick() {
-        document.querySelector('.film-details').remove();
-        document.body.classList.remove('hide-overflow');
-        popupComponent.removeClickPopupCloser(onCloseButtonClick);
-        document.removeEventListener('keydown', onEscKeyDown);
-      }
-
-      function onEscKeyDown(evt) {
-        if (evt.key === 'Escape' || evt.key === 'Esc') {
-          evt.preventDefault();
-          onCloseButtonClick();
-        }
-      }
-    }
-
-    function renderPopupComments(arr) {
-      for (let j = 0; j < arr.length; j++) {
-        render(new NewCommentsView(arr[j]), siteBody.querySelector('.film-details__comments-list'));
-      }
-      siteBody.querySelector('.film-details__comments-count').textContent=commentsAmount;
-    }
-
-    featureComponent.setClickPopupOpener(()=>{
-      renderPopup();
-      renderPopupComments(popupComments);
-    });
-  }
 }
