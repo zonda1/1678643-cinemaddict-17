@@ -158,12 +158,6 @@ export class NewPopupView extends AbstractView {
     this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickClosePopupHandler);
   };
 
-  removeClickPopupCloser = (callback) => {
-    this._callback.click = callback;
-    this.element.querySelector('.film-details__close-btn').removeEventListener('click', this.#clickClosePopupHandler);
-  };
-
-
   setWatchlistClickHandler = (callback) => {
     this._callback.watchlistClick = callback;
     this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchlistClickHandler);

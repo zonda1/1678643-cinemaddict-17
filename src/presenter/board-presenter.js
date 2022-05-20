@@ -52,7 +52,6 @@ export class BoardPresenter {
     if (this.#boardFeatures.length > TASK_COUNT_PER_STEP) {
       this.#renderLoadMoreButton();
     }
-    console.log(this.#boardFeatures[0]);
   };
 
   #renderFeatures = (from, to) => {
@@ -62,7 +61,7 @@ export class BoardPresenter {
   };
 
   #renderFeature(task) {
-    const filmPresenter = new FilmPresenter(this.filmsListContainer.element,this.#featureModel, this.#boardFeatures,this.#handleFeatureChange);
+    const filmPresenter = new FilmPresenter(this.filmsListContainer.element,this.#featureModel, this.#boardFeatures,this.#handleFeatureChange,this.#handleOpenPopup);
     filmPresenter.init(task);
     this.#filmPresenter.set(task.id,filmPresenter);
   }
@@ -70,6 +69,12 @@ export class BoardPresenter {
   #handleFeatureChange = (updatedTask) => {
     this.#boardFeatures = updateItem(this.#boardFeatures, updatedTask);
     this.#filmPresenter.get(updatedTask.id).init(updatedTask);
+  };
+
+  #handleOpenPopup = () => {
+    for (const presenter of this.#filmPresenter.values()) {
+      presenter.closePopup();
+    }
   };
 
   #clearFeatureList = () => {

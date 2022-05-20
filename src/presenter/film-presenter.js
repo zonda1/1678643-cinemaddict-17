@@ -16,19 +16,20 @@ export default class FilmPresenter {
   #featureModel=null;
   #boardFeatures=null;
   #changeData = null;
+  #handleOpenPopup=null;
 
-  constructor(filmsListContainer,featureModel,boardFeatures, changeData) {
+  constructor(filmsListContainer,featureModel,boardFeatures, changeData,handleOpenPopup) {
     this.#filmsListContainer = filmsListContainer;
     this.#featureModel = featureModel;
     this.#boardFeatures = boardFeatures;
     this.#changeData=changeData;
+    this.#handleOpenPopup=handleOpenPopup;
   }
 
   init = (task) => {
     this.#task = task;
 
     const prevFeatureComponent=this.#featureComponent;
-    // const prevPopupComponent=this.#popupComponent;
 
     this.#popupComments = this.#featureModel.getCommentForFeature(this.#boardFeatures[0].id);
 
@@ -36,19 +37,24 @@ export default class FilmPresenter {
 
     this.#featureComponent= new NewFilmCardView(task);
 
+    this.#featureComponent.setClickPopupOpener(()=>{
+      this.#renderPopup();
+      this.#renderPopupComments(this.#popupComments);
+    });
+
+    this.#featureComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
+    this.#featureComponent.setWatchedClickHandler(this.#handleWatchedClick);
+    this.#featureComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
+
     if (prevFeatureComponent===null) {
       render(this.#featureComponent, this.#filmsListContainer);
-
-      this.#featureComponent.setClickPopupOpener(()=>{
-        this.#renderPopup();
-        this.#renderPopupComments(this.#popupComments);
-      });
-      this.#featureComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
-      this.#featureComponent.setWatchedClickHandler(this.#handleWatchedClick);
-      this.#featureComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
-      // console.log(this.#changeData(task));
-      // console.log(this.#featureComponent);
       return;
+    }
+    //Чтобы увидеть измененное состояние кнопок, мы удаляем текущий компонент и рендерим новый
+    if (this.#popupComponent) {
+      this.#onCloseButtonClick();
+      this.#renderPopup();
+      this.#renderPopupComments(this.#popupComments);
     }
 
     if (this.#filmsListContainer.contains(prevFeatureComponent.element)) {
@@ -61,7 +67,14 @@ export default class FilmPresenter {
     remove(this.#featureComponent);
   };
 
+  closePopup=()=>{
+    if (this.#popupComponent) {
+      this.#onCloseButtonClick();
+    }
+  };
+
   #renderPopup() {
+    this.#handleOpenPopup();
     this.#popupComponent=new NewPopupView(this.#task);
     document.body.append(this.#popupComponent.element);
     this.#popupComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
@@ -80,10 +93,10 @@ export default class FilmPresenter {
   };
 
   #onCloseButtonClick=()=> {
-    document.querySelector('.film-details').remove();
+    remove(this.#popupComponent);
     document.body.classList.remove('hide-overflow');
-    this.#popupComponent.removeClickPopupCloser(this.#onCloseButtonClick);
     document.removeEventListener('keydown', this.#onEscKeyDown);
+    this.#popupComponent=null;
   };
 
 
@@ -95,14 +108,14 @@ export default class FilmPresenter {
   }
 
   #handleWatchlistClick = () => {
-    this.#changeData({...this.#task, watchlist: !this.#task.userDetails.watchlist});
+    this.#changeData({...this.#task, userDetails:{...this.#task.userDetails,watchlist: !this.#task.userDetails.watchlist}});
   };
 
   #handleWatchedClick = () => {
-    this.#changeData({...this.#task, alreadyWatched: !this.#task.userDetails.alreadyWatched});
+    this.#changeData({...this.#task, userDetails:{...this.#task.userDetails,alreadyWatched: !this.#task.userDetails.alreadyWatched}});
   };
 
   #handleFavoriteClick = () => {
-    this.#changeData({...this.#task, favorite: !this.#task.userDetails.favorite});
+    this.#changeData({...this.#task, userDetails:{...this.#task.userDetails,favorite: !this.#task.userDetails.favorite}});
   };
 }
