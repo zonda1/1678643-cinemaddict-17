@@ -46,7 +46,7 @@ export default class FilmPresenter {
       this.#featureComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
       this.#featureComponent.setWatchedClickHandler(this.#handleWatchedClick);
       this.#featureComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
-      // console.log(this.#changeData);
+      // console.log(this.#changeData(task));
       // console.log(this.#featureComponent);
       return;
     }
@@ -64,6 +64,9 @@ export default class FilmPresenter {
   #renderPopup() {
     this.#popupComponent=new NewPopupView(this.#task);
     document.body.append(this.#popupComponent.element);
+    this.#popupComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
+    this.#popupComponent.setWatchedClickHandler(this.#handleWatchedClick);
+    this.#popupComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
     document.body.classList.add('hide-overflow');
     document.addEventListener('keydown',this.#onEscKeyDown);
     this.#popupComponent.setClickPopupCloser(this.#onCloseButtonClick);
