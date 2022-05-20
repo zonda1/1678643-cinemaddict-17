@@ -4,9 +4,10 @@ import {NewFilmsSectionView} from '../view/new-films-section-view';
 import {NewFilmsListSectionView} from '../view/new-films-list-section-view';
 import {NewFilmsListContainerView} from '../view/new-films-container-view';
 import {NewButtonView} from '../view/new-button-view.js';
-import {render} from '../framework/render.js';
+import {render,remove} from '../framework/render.js';
 import {NoFeatureView} from '../view/no-feature-view';
 import FilmPresenter from './film-presenter';
+import {updateItem} from '../utils.js';
 
 const TASK_COUNT_PER_STEP = 5;
 
@@ -20,6 +21,8 @@ export class BoardPresenter {
   filmsListSection = new NewFilmsListSectionView();
   filmsListContainer = new NewFilmsListContainerView();
   #loadMoreButtonComponent = new NewButtonView();
+
+  #filmPresenter=new Map();
 
   #renderedFeatureCount = TASK_COUNT_PER_STEP;
 
@@ -49,6 +52,7 @@ export class BoardPresenter {
     if (this.#boardFeatures.length > TASK_COUNT_PER_STEP) {
       this.#renderLoadMoreButton();
     }
+    console.log(this.#boardFeatures[0]);
   };
 
   #renderFeatures = (from, to) => {
@@ -58,9 +62,22 @@ export class BoardPresenter {
   };
 
   #renderFeature(task) {
-    const filmPresenter = new FilmPresenter(this.filmsListContainer.element);
-    filmPresenter.init(task,this.#featureModel,this.#boardFeatures);
+    const filmPresenter = new FilmPresenter(this.filmsListContainer.element,this.#featureModel, this.#boardFeatures,this.#handleFeatureChange);
+    filmPresenter.init(task);
+    this.#filmPresenter.set(task.id,filmPresenter);
   }
+
+  #handleFeatureChange = (updatedTask) => {
+    this.#boardFeatures = updateItem(this.#boardFeatures, updatedTask);
+    this.#filmPresenter.get(updatedTask.id).init(updatedTask);
+  };
+
+  #clearFeatureList = () => {
+    this.#filmPresenter.forEach((presenter) => presenter.destroy());
+    this.#filmPresenter.clear();
+    this.#renderedFeatureCount = TASK_COUNT_PER_STEP;
+    remove(this.#loadMoreButtonComponent);
+  };
 
   #renderLoadMoreButton = () => {
     render(this.#loadMoreButtonComponent, this.filmsListSection.element);

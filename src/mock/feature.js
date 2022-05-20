@@ -1,4 +1,5 @@
 import {getRandomInteger} from '../utils';
+import {nanoid} from 'nanoid';
 
 const generateDescription = () => {
   const descriptions = [
@@ -29,17 +30,15 @@ const generateFilmTitles = () => {
   return titles[randomIndex];
 };
 
-let currentFilmId=0;
+// let currentFilmId=0;
 
 export const generateFilmFeature = () => {
   const generatedFilmTitle=generateFilmTitles();
 
 
   return ({
-    id:currentFilmId++,
-    // comments: [
-    //   $Comment.id$, $Comment.id$
-    // ],
+    // id:currentFilmId++,
+    id:nanoid(),
     filmInfo: {
       title:generatedFilmTitle,
       alternativeTitle: 'Laziness Who Sold Themselves',

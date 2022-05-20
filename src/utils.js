@@ -11,4 +11,18 @@ const humanizeOnlyYear = (dueDate) => dayjs(dueDate).format('YYYY');
 const humanizeWholeDate = (dueDate) => dayjs(dueDate).format('DD MMMM YYYY');
 const humanizeWholeDateWithTime = (dueDate) => dayjs(dueDate).format('YYYY/MM/DD HH:mm');
 
-export {getRandomInteger, humanizeOnlyYear,humanizeWholeDate,humanizeWholeDateWithTime};
+const updateItem = (items, update) => {
+  const index = items.findIndex((item) => item.id === update.id);
+
+  if (index === -1) {
+    return items;
+  }
+
+  return [
+    ...items.slice(0, index),
+    update,
+    ...items.slice(index + 1),
+  ];
+};
+
+export {getRandomInteger, humanizeOnlyYear,humanizeWholeDate,humanizeWholeDateWithTime,updateItem};
