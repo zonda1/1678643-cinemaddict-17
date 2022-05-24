@@ -1,6 +1,7 @@
 import {render} from './framework/render.js';
 import {generateFilmFeature} from './mock/feature.js';
 import {generateFilmComments} from './mock/feature.js';
+import {generateFilter} from './mock/filter.js';
 import {NewUserLogoView} from './view/new-user-logo-view.js';
 import {BoardPresenter} from './presenter/board-presenter.js';
 import {FeatureModel} from './model/feature-model.js';
@@ -15,6 +16,7 @@ const comments = features.flatMap((film)=>Array.from({length: 10}, ()=>generateF
 const boardPresenter=new BoardPresenter();
 const featureModel=new FeatureModel(features,comments);
 
+const filters=generateFilter(featureModel.features);
 render(new NewUserLogoView(), siteHeaderElement);
-boardPresenter.init(siteMainElement,featureModel);
+boardPresenter.init(siteMainElement,featureModel,filters);
 

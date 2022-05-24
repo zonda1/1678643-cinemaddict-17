@@ -13,33 +13,26 @@ export default class FilmPresenter {
   #popupComponent=null;
   #popupComments=null;
   #commentsAmount=null;
-  #featureModel=null;
-  #boardFeatures=null;
   #changeData = null;
   #handleOpenPopup=null;
 
-  constructor(filmsListContainer,featureModel,boardFeatures, changeData,handleOpenPopup) {
+  constructor(filmsListContainer,popupComments, changeData,handleOpenPopup) {
     this.#filmsListContainer = filmsListContainer;
-    this.#featureModel = featureModel;
-    this.#boardFeatures = boardFeatures;
+    this.#popupComments=popupComments;
     this.#changeData=changeData;
     this.#handleOpenPopup=handleOpenPopup;
   }
 
   init = (task) => {
     this.#task = task;
-
     const prevFeatureComponent=this.#featureComponent;
 
-    this.#popupComments = this.#featureModel.getCommentForFeature(this.#boardFeatures[0].id);
-
+    this.#featureComponent= new NewFilmCardView(task);
     this.#commentsAmount=this.#popupComments.length;
 
-    this.#featureComponent= new NewFilmCardView(task);
 
     this.#featureComponent.setClickPopupOpener(()=>{
       this.#renderPopup();
-      this.#renderPopupComments(this.#popupComments);
     });
 
     this.#featureComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
@@ -77,6 +70,7 @@ export default class FilmPresenter {
     this.#handleOpenPopup();
     this.#popupComponent=new NewPopupView(this.#task);
     document.body.append(this.#popupComponent.element);
+    this.#renderPopupComments(this.#popupComments);
     this.#popupComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
     this.#popupComponent.setWatchedClickHandler(this.#handleWatchedClick);
     this.#popupComponent.setFavoriteClickHandler(this.#handleFavoriteClick);

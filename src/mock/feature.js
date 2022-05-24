@@ -30,14 +30,10 @@ const generateFilmTitles = () => {
   return titles[randomIndex];
 };
 
-// let currentFilmId=0;
-
 export const generateFilmFeature = () => {
   const generatedFilmTitle=generateFilmTitles();
 
-
   return ({
-    // id:currentFilmId++,
     id:nanoid(),
     filmInfo: {
       title:generatedFilmTitle,

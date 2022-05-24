@@ -21,16 +21,19 @@ export class BoardPresenter {
   filmsListSection = new NewFilmsListSectionView();
   filmsListContainer = new NewFilmsListContainerView();
   #loadMoreButtonComponent = new NewButtonView();
-
+  #filterFeatures=null;
+  #popupComments=null;
   #filmPresenter=new Map();
 
   #renderedFeatureCount = TASK_COUNT_PER_STEP;
 
-  init = (boardContainer,featureModel) => {
+  init = (boardContainer,featureModel,filterFeatures) => {
 
     this.#boardContainer = boardContainer;
     this.#featureModel = featureModel;
     this.#boardFeatures = [...this.#featureModel.features];
+    this.#popupComments = this.#featureModel.getCommentForFeature(this.#boardFeatures[0].id);
+    this.#filterFeatures=filterFeatures;
 
     if (this.#boardFeatures.every((film)=>film.isArchive)) {
       render(this.filmsSection, this.#boardContainer);
@@ -38,7 +41,7 @@ export class BoardPresenter {
       render(new NoFeatureView(),this.filmsListSection.element);
     }
     else {
-      render(new NewFilterView(), siteMainElement);
+      render(new NewFilterView(this.#filterFeatures), siteMainElement);
       render(new NewSortView(), siteMainElement);
       render(this.filmsSection, this.#boardContainer);
       render(this.filmsListSection, this.filmsSection.element);
@@ -61,7 +64,7 @@ export class BoardPresenter {
   };
 
   #renderFeature(task) {
-    const filmPresenter = new FilmPresenter(this.filmsListContainer.element,this.#featureModel, this.#boardFeatures,this.#handleFeatureChange,this.#handleOpenPopup);
+    const filmPresenter = new FilmPresenter(this.filmsListContainer.element,this.#popupComments,this.#handleFeatureChange,this.#handleOpenPopup);
     filmPresenter.init(task);
     this.#filmPresenter.set(task.id,filmPresenter);
   }
@@ -94,8 +97,7 @@ export class BoardPresenter {
     this.#renderedFeatureCount += TASK_COUNT_PER_STEP;
 
     if (this.#renderedFeatureCount >= this.#boardFeatures.length) {
-      this.#loadMoreButtonComponent.element.remove();
-      this.#loadMoreButtonComponent.removeElement();
+      remove(this.#loadMoreButtonComponent);
     }
   };
 }
