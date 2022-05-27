@@ -16,7 +16,7 @@ export default class FilmPresenter {
   #changeData = null;
   #handleOpenPopup=null;
 
-  constructor(filmsListContainer,popupComments, changeData,handleOpenPopup) {
+  constructor(filmsListContainer,popupComments,changeData,handleOpenPopup) {
     this.#filmsListContainer = filmsListContainer;
     this.#popupComments=popupComments;
     this.#changeData=changeData;
@@ -26,10 +26,8 @@ export default class FilmPresenter {
   init = (task) => {
     this.#task = task;
     const prevFeatureComponent=this.#featureComponent;
-
     this.#featureComponent= new NewFilmCardView(task);
     this.#commentsAmount=this.#popupComments.length;
-
 
     this.#featureComponent.setClickPopupOpener(()=>{
       this.#renderPopup();
@@ -47,7 +45,6 @@ export default class FilmPresenter {
     if (this.#popupComponent) {
       this.#onCloseButtonClick();
       this.#renderPopup();
-      this.#renderPopupComments(this.#popupComments);
     }
 
     if (this.#filmsListContainer.contains(prevFeatureComponent.element)) {

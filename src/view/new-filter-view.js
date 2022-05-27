@@ -1,15 +1,20 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import { makeUpperCaseFirst } from '../utils.js';
 
 const createNewFilterItemTemplate = (filter) => {
   const {name,count}=filter;
-
+  if (name ==='all') {
+    return (`
+    <a href="#${name}" class="main-navigation__item">${makeUpperCaseFirst(name)}</a>
+  `);}
   return (`
-    <a href="#${name}" class="main-navigation__item">${name[0].toUpperCase() + name.slice(1)} <span class="main-navigation__item-count">${count}</span></a>
-  `);};
+  <a href="#${name}" class="main-navigation__item">${makeUpperCaseFirst(name)} <span class="main-navigation__item-count">${count}</span></a>
+`);
+};
 
 const createFilterTemplate = (filterItems) => {
   const filterItemsTemplate = filterItems
-    .map((filter, index) => createNewFilterItemTemplate(filter, index === 0))
+    .map((filter) => createNewFilterItemTemplate(filter))
     .join('');
 
   return `<nav class="main-navigation">

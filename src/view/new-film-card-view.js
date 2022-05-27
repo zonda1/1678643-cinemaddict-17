@@ -2,7 +2,7 @@ import AbstractView from '../framework/view/abstract-view.js';
 import {humanizeOnlyYear} from '../utils.js';
 
 const createNewFilmCardTemplate = (feature) => {
-  const {title,posters, description, runtime, genre} = feature.filmInfo;
+  const {title,posters, description,totalRating,runtime, genre} = feature.filmInfo;
   const {date}=feature.filmInfo.release;
   const filmDate=humanizeOnlyYear(date);
   const {watchlist,alreadyWatched:watched,favorite}=feature.userDetails;
@@ -13,7 +13,7 @@ const createNewFilmCardTemplate = (feature) => {
 <article class="film-card">
 <a class="film-card__link">
   <h3 class="film-card__title">${title}</h3>
-  <p class="film-card__rating">8.3</p>
+  <p class="film-card__rating">${totalRating}</p>
   <p class="film-card__info">
     <span class="film-card__year">${filmDate}</span>
     <span class="film-card__duration">${runtime}m</span>

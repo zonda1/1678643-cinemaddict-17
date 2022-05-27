@@ -7,7 +7,8 @@ import {NewButtonView} from '../view/new-button-view.js';
 import {render,remove} from '../framework/render.js';
 import {NoFeatureView} from '../view/no-feature-view';
 import FilmPresenter from './film-presenter';
-import {updateItem} from '../utils.js';
+import {updateItem,sortDateDown,sortRatingDown} from '../utils.js';
+import { SortType } from '../const/const.js';
 
 const TASK_COUNT_PER_STEP = 5;
 
@@ -21,6 +22,9 @@ export class BoardPresenter {
   filmsListSection = new NewFilmsListSectionView();
   filmsListContainer = new NewFilmsListContainerView();
   #loadMoreButtonComponent = new NewButtonView();
+  #sortComponent=new NewSortView();
+  #currentSortType=SortType.DEFAULT;
+  #sourcedBoardFeatures=[];
   #filterFeatures=null;
   #popupComments=null;
   #filmPresenter=new Map();
@@ -32,6 +36,8 @@ export class BoardPresenter {
     this.#boardContainer = boardContainer;
     this.#featureModel = featureModel;
     this.#boardFeatures = [...this.#featureModel.features];
+    // 1. Записываем исходный массив с фильмами по ссылке, чтобы после мутаций массива мы смогли вернуться в исходное состояние
+    this.#sourcedBoardFeatures = [...this.#featureModel.features];
     this.#popupComments = this.#featureModel.getCommentForFeature(this.#boardFeatures[0].id);
     this.#filterFeatures=filterFeatures;
 
@@ -42,12 +48,49 @@ export class BoardPresenter {
     }
     else {
       render(new NewFilterView(this.#filterFeatures), siteMainElement);
-      render(new NewSortView(), siteMainElement);
+      this.#renderSort();
       render(this.filmsSection, this.#boardContainer);
       render(this.filmsListSection, this.filmsSection.element);
       render(this.filmsListContainer, this.filmsListSection.element);
     }
     this.#renderFeatureList();
+  };
+
+  #sortTasks = (sortType) => {
+    // 2. Этот исходный массив задач необходим,
+    // потому что для сортировки мы будем мутировать
+    // массив в свойстве _boardTasks
+    switch (sortType) {
+      case SortType.DATE:
+        this.#boardFeatures.sort(sortDateDown);
+        break;
+      case SortType.RATING:
+        this.#boardFeatures.sort(sortRatingDown);
+        break;
+      default:
+        // 3. А когда пользователь захочет "вернуть всё, как было",
+        // мы просто запишем в _boardTasks исходный массив
+        this.#boardFeatures = [...this.#sourcedBoardFeatures];
+    }
+
+    this.#currentSortType = sortType;
+  };
+
+  #handleSortTypeChange = (sortType) => {
+    // - Сортируем задачи
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+    this.#sortTasks(sortType);
+    // - Очищаем список
+    this.#clearFeatureList();
+    // - Рендерим список заново
+    this.#renderFeatureList();
+  };
+
+  #renderSort=()=> {
+    render(this.#sortComponent, siteMainElement);
+    this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
   };
 
   #renderFeatureList = () => {
@@ -71,6 +114,7 @@ export class BoardPresenter {
 
   #handleFeatureChange = (updatedTask) => {
     this.#boardFeatures = updateItem(this.#boardFeatures, updatedTask);
+    this.#sourcedBoardFeatures = updateItem(this.#sourcedBoardFeatures, updatedTask);
     this.#filmPresenter.get(updatedTask.id).init(updatedTask);
   };
 

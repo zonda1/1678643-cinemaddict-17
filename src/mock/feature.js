@@ -1,4 +1,4 @@
-import {getRandomInteger} from '../utils';
+import {getRandomInteger,getRandomFractional} from '../utils';
 import {nanoid} from 'nanoid';
 
 const generateDescription = () => {
@@ -38,7 +38,7 @@ export const generateFilmFeature = () => {
     filmInfo: {
       title:generatedFilmTitle,
       alternativeTitle: 'Laziness Who Sold Themselves',
-      totalRating: 5.3,
+      totalRating: getRandomFractional(),
       posters: filmTitleToUrl[generatedFilmTitle],
       ageRating: 0,
       director: 'Tom Ford',
@@ -49,7 +49,7 @@ export const generateFilmFeature = () => {
         'Morgan Freeman'
       ],
       release: {
-        date: '2019-05-11T00:00:00.000Z',
+        date: `${getRandomInteger(1950,2022)}-05-11T00:00:00.000Z`,
         releaseCountry: 'Finland'
       },
       runtime: 77,
