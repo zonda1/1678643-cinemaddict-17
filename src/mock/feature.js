@@ -1,5 +1,6 @@
 import {getRandomInteger,getRandomFractional} from '../utils';
 import {nanoid} from 'nanoid';
+import { EMOTIONS } from '../const/const';
 
 const generateDescription = () => {
   const descriptions = [
@@ -29,6 +30,13 @@ const generateFilmTitles = () => {
   const randomIndex = getRandomInteger(0, titles.length - 1);
   return titles[randomIndex];
 };
+
+const getRandomEmotion = () => {
+  const randomIndex = getRandomInteger(0, EMOTIONS.length - 1);
+
+  return EMOTIONS[randomIndex];
+};
+
 
 export const generateFilmFeature = () => {
   const generatedFilmTitle=generateFilmTitles();
@@ -72,6 +80,6 @@ export const generateFilmComments = (filmId) => ({
   author: `Ilya O'Reilly`,
   comment: 'a film that changed my life, a true masterpiece, post-credit scene was just amazing omg.',
   date: '2019-05-11T16:12:32.554Z',
-  emotion: 'smile'
+  emotion: getRandomEmotion()
 });
 
