@@ -2,6 +2,14 @@
 import AbstractView from '../framework/view/abstract-view';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import {humanizeWholeDate,humanizeWholeDateWithTime} from '../utils.js';
+import { EMOTIONS } from '../const/const';
+
+
+const createNewEmotionTemplate=(chosenEmotion)=>EMOTIONS.map((emotion)=>`
+<input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}" value="${emotion}" ${(emotion===chosenEmotion)?'checked':''}>
+<label class="film-details__emoji-label" for="emoji-${emotion}">
+  <img src="./images/emoji/${emotion}.png" width="30" height="30" alt="emoji">
+</label>`).join('');
 
 const createNewCommentTemplate=(chosenEmotion)=> (`
 <div class="film-details__new-comment">
@@ -15,25 +23,7 @@ ${(chosenEmotion!==null)? `<img src="./images/emoji/${chosenEmotion}.png" width=
 </label>
 
 <div class="film-details__emoji-list">
-  <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
-  <label class="film-details__emoji-label" for="emoji-smile">
-    <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
-  </label>
-
-  <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
-  <label class="film-details__emoji-label" for="emoji-sleeping">
-    <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
-  </label>
-
-  <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
-  <label class="film-details__emoji-label" for="emoji-puke">
-    <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
-  </label>
-
-  <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
-  <label class="film-details__emoji-label" for="emoji-angry">
-    <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
-  </label>
+  ${createNewEmotionTemplate(chosenEmotion)}
 </div>
 </div>`);
 
@@ -191,12 +181,10 @@ export class NewPopupView extends AbstractStatefulView {
       buttons[i].addEventListener('change',this.#emotionPickHandler);
     }
   };
-  // #setInnerHandlers = () => this.element.querySelector('.film-details__emoji-list').addEventListener('change',this.#emotionPickHandler);
 
   #emotionPickHandler = (evt) => {
     evt.preventDefault();
     this.updateElement({
-      // chosenEmotion: {...this._state.chosenEmotion, [evt.target.value]: evt.target.checked}
       chosenEmotion: evt.target.value
     });
   };
