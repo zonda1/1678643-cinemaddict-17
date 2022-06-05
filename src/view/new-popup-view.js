@@ -1,5 +1,4 @@
 /* eslint-disable quotes */
-import AbstractView from '../framework/view/abstract-view';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import {humanizeWholeDate,humanizeWholeDateWithTime} from '../utils.js';
 import { EMOTIONS } from '../const/const';
@@ -27,9 +26,30 @@ ${(chosenEmotion!==null)? `<img src="./images/emoji/${chosenEmotion}.png" width=
 </div>
 </div>`);
 
+const createAllCommentsTemplate=(comments)=>{
+  const {comment,author,date,emotion}=comments;
+  const commentDate=humanizeWholeDateWithTime(date);
+
+  return (`<li class="film-details__comment">
+  <span class="film-details__comment-emoji">
+    <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
+  </span>
+  <div>
+    <p class="film-details__comment-text">${comment}</p>
+    <p class="film-details__comment-info">
+      <span class="film-details__comment-author">${author}</span>
+      <span class="film-details__comment-day">${commentDate}</span>
+      <button class="film-details__comment-delete">Delete</button>
+    </p>
+  </div>
+</li>
+`);};
+
+
 const createNewPopupTemplate = (feature) => {
   const {title,alternativeTitle,posters, description, runtime, genre,director,writers,actors} = feature.filmInfo;
   const {date}=feature.filmInfo.release;
+  const {comments=[]}=feature;
   const {chosenEmotion}=feature;
   const filmDate=humanizeWholeDate(date);
   const {watchlist,alreadyWatched:watched,favorite}=feature.userDetails;
@@ -107,10 +127,10 @@ const createNewPopupTemplate = (feature) => {
 
   <div class="film-details__bottom-container">
     <section class="film-details__comments-wrap">
-      <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count"></span></h3>
+      <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
       <ul class="film-details__comments-list">
-
+      ${comments.map(createAllCommentsTemplate).join('')}
       </ul>
       ${newCommentTempalte}
 
@@ -119,24 +139,6 @@ const createNewPopupTemplate = (feature) => {
 </form>
 </section>`);};
 
-const createNewCommentsTemplate=(comments)=>{
-  const {comment,author,date,emotion}=comments;
-  const commentDate=humanizeWholeDateWithTime(date);
-
-  return (`<li class="film-details__comment">
-  <span class="film-details__comment-emoji">
-    <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
-  </span>
-  <div>
-    <p class="film-details__comment-text">${comment}</p>
-    <p class="film-details__comment-info">
-      <span class="film-details__comment-author">${author}</span>
-      <span class="film-details__comment-day">${commentDate}</span>
-      <button class="film-details__comment-delete">Delete</button>
-    </p>
-  </div>
-</li>
-`);};
 
 export class NewPopupView extends AbstractStatefulView {
 
@@ -150,9 +152,12 @@ export class NewPopupView extends AbstractStatefulView {
     return createNewPopupTemplate(this._state);
   }
 
+  setComments(comments) {
+    this.updateElement({comments:comments});
+  }
 
   static parseFeaturesToState = (feature) => ({...feature,
-    chosenEmotion: null,
+    chosenEmotion: null
   });
 
   static parseStateToFeatures = (state) => {
@@ -184,9 +189,11 @@ export class NewPopupView extends AbstractStatefulView {
 
   #emotionPickHandler = (evt) => {
     evt.preventDefault();
+    const oldScrollPosition=this.element.scrollTop;
     this.updateElement({
       chosenEmotion: evt.target.value
     });
+    this.element.scrollTop=oldScrollPosition;
   };
 
   setClickPopupCloser = (callback) => {
@@ -229,18 +236,6 @@ export class NewPopupView extends AbstractStatefulView {
     evt.preventDefault();
     this._callback.click();
   };
-
 }
-export class NewCommentsView extends AbstractView {
 
-  #comments=null;
 
-  constructor(comments) {
-    super();
-    this.#comments = comments;
-  }
-
-  get template() {
-    return createNewCommentsTemplate(this.#comments);
-  }
-}

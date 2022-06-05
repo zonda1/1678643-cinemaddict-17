@@ -38,7 +38,6 @@ export class BoardPresenter {
     this.#boardFeatures = [...this.#featureModel.features];
     // 1. Записываем исходный массив с фильмами по ссылке, чтобы после мутаций массива мы смогли вернуться в исходное состояние
     this.#sourcedBoardFeatures = [...this.#featureModel.features];
-    this.#popupComments = this.#featureModel.getCommentForFeature(this.#boardFeatures[0].id);
     this.#filterFeatures=filterFeatures;
 
     if (this.#boardFeatures.every((film)=>film.isArchive)) {
@@ -107,7 +106,8 @@ export class BoardPresenter {
   };
 
   #renderFeature(task) {
-    const filmPresenter = new FilmPresenter(this.filmsListContainer.element,this.#popupComments,this.#handleFeatureChange,this.#handleOpenPopup);
+    const comments = this.#featureModel.getCommentForFeature(task.id);
+    const filmPresenter = new FilmPresenter(this.filmsListContainer.element,comments,this.#handleFeatureChange,this.#handleOpenPopup);
     filmPresenter.init(task);
     this.#filmPresenter.set(task.id,filmPresenter);
   }

@@ -1,9 +1,6 @@
 import {NewFilmCardView} from '../view/new-film-card-view.js';
 import {NewPopupView} from '../view/new-popup-view.js';
-import {NewCommentsView} from '../view/new-popup-view.js';
 import {render,replace,remove} from '../framework/render.js';
-
-const siteBody=document.querySelector('body');
 
 export default class FilmPresenter {
 
@@ -12,7 +9,6 @@ export default class FilmPresenter {
   #featureComponent=null;
   #popupComponent=null;
   #popupComments=null;
-  #commentsAmount=null;
   #changeData = null;
   #handleOpenPopup=null;
 
@@ -27,8 +23,6 @@ export default class FilmPresenter {
     this.#task = task;
     const prevFeatureComponent=this.#featureComponent;
     this.#featureComponent= new NewFilmCardView(task);
-    this.#commentsAmount=this.#popupComments.length;
-
     this.#featureComponent.setClickPopupOpener(()=>{
       this.#renderPopup();
     });
@@ -66,8 +60,9 @@ export default class FilmPresenter {
   #renderPopup() {
     this.#handleOpenPopup();
     this.#popupComponent=new NewPopupView(this.#task);
+    this.#popupComponent.setComments(this.#popupComments);
     document.body.append(this.#popupComponent.element);
-    this.#renderPopupComments(this.#popupComments);
+
     this.#popupComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
     this.#popupComponent.setWatchedClickHandler(this.#handleWatchedClick);
     this.#popupComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
@@ -89,14 +84,6 @@ export default class FilmPresenter {
     document.removeEventListener('keydown', this.#onEscKeyDown);
     this.#popupComponent=null;
   };
-
-
-  #renderPopupComments(arr) {
-    for (let j = 0; j < arr.length; j++) {
-      render(new NewCommentsView(arr[j]), siteBody.querySelector('.film-details__comments-list'));
-    }
-    siteBody.querySelector('.film-details__comments-count').textContent=this.#commentsAmount;
-  }
 
   #handleWatchlistClick = () => {
     this.#changeData({...this.#task, userDetails:{...this.#task.userDetails,watchlist: !this.#task.userDetails.watchlist}});
