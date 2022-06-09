@@ -21,21 +21,8 @@ const humanizeOnlyYear = (dueDate) => dayjs(dueDate).format('YYYY');
 const humanizeWholeDate = (dueDate) => dayjs(dueDate).format('DD MMMM YYYY');
 const humanizeWholeDateWithTime = (dueDate) => dayjs(dueDate).format('YYYY/MM/DD HH:mm');
 
-const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if (index === -1) {
-    return items;
-  }
-
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1),
-  ];
-};
 
 const sortDateDown = (taskA, taskB) => dayjs(taskB.filmInfo.release.date).diff(dayjs(taskA.filmInfo.release.date));
 const sortRatingDown = (taskA, taskB) => taskB.filmInfo.totalRating-taskA.filmInfo.totalRating;
 
-export {getRandomInteger,getRandomFractional,makeUpperCaseFirst,humanizeOnlyYear,humanizeWholeDate,humanizeWholeDateWithTime,updateItem,sortDateDown,sortRatingDown};
+export {getRandomInteger,getRandomFractional,makeUpperCaseFirst,humanizeOnlyYear,humanizeWholeDate,humanizeWholeDateWithTime,sortDateDown,sortRatingDown};

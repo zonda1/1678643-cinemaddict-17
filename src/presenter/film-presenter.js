@@ -1,6 +1,7 @@
 import {NewFilmCardView} from '../view/new-film-card-view.js';
 import {NewPopupView} from '../view/new-popup-view.js';
 import {render,replace,remove} from '../framework/render.js';
+import {UserAction,UpdateType} from '../const/const.js';
 
 export default class FilmPresenter {
 
@@ -86,14 +87,23 @@ export default class FilmPresenter {
   };
 
   #handleWatchlistClick = () => {
-    this.#changeData({...this.#task, userDetails:{...this.#task.userDetails,watchlist: !this.#task.userDetails.watchlist}});
+    this.#changeData(
+      UserAction.UPDATE_TASK,
+      UpdateType.MINOR,
+      {...this.#task, userDetails:{...this.#task.userDetails,watchlist: !this.#task.userDetails.watchlist}});
   };
 
   #handleWatchedClick = () => {
-    this.#changeData({...this.#task, userDetails:{...this.#task.userDetails,alreadyWatched: !this.#task.userDetails.alreadyWatched}});
+    this.#changeData(
+      UserAction.UPDATE_TASK,
+      UpdateType.MINOR,
+      {...this.#task, userDetails:{...this.#task.userDetails,alreadyWatched: !this.#task.userDetails.alreadyWatched}});
   };
 
   #handleFavoriteClick = () => {
-    this.#changeData({...this.#task, userDetails:{...this.#task.userDetails,favorite: !this.#task.userDetails.favorite}});
+    this.#changeData(
+      UserAction.UPDATE_TASK,
+      UpdateType.MINOR,
+      {...this.#task, userDetails:{...this.#task.userDetails,favorite: !this.#task.userDetails.favorite}});
   };
 }

@@ -7,8 +7,8 @@ import {NewButtonView} from '../view/new-button-view.js';
 import {render,remove} from '../framework/render.js';
 import {NoFeatureView} from '../view/no-feature-view';
 import FilmPresenter from './film-presenter';
-import {updateItem,sortDateDown,sortRatingDown} from '../utils.js';
-import { SortType } from '../const/const.js';
+import {sortDateDown,sortRatingDown} from '../utils.js';
+import { SortType,UserAction,UpdateType} from '../const/const.js';
 
 const TASK_COUNT_PER_STEP = 5;
 
@@ -17,16 +17,13 @@ const siteMainElement=document.querySelector('.main');
 export class BoardPresenter {
   #boardContainer=null;
   #featureModel=null;
-  #boardFeatures=[];
   filmsSection = new NewFilmsSectionView();
   filmsListSection = new NewFilmsListSectionView();
   filmsListContainer = new NewFilmsListContainerView();
   #loadMoreButtonComponent = new NewButtonView();
   #sortComponent=new NewSortView();
   #currentSortType=SortType.DEFAULT;
-  #sourcedBoardFeatures=[];
   #filterFeatures=null;
-  #popupComments=null;
   #filmPresenter=new Map();
 
   #renderedFeatureCount = TASK_COUNT_PER_STEP;
@@ -35,12 +32,11 @@ export class BoardPresenter {
 
     this.#boardContainer = boardContainer;
     this.#featureModel = featureModel;
-    this.#boardFeatures = [...this.#featureModel.features];
-    // 1. Записываем исходный массив с фильмами по ссылке, чтобы после мутаций массива мы смогли вернуться в исходное состояние
-    this.#sourcedBoardFeatures = [...this.#featureModel.features];
     this.#filterFeatures=filterFeatures;
 
-    if (this.#boardFeatures.every((film)=>film.isArchive)) {
+    // this.#featureModel.addObserver(this.#handleModelEvent);
+
+    if (this.features.every((film)=>film.isArchive)) {
       render(this.filmsSection, this.#boardContainer);
       render(this.filmsListSection, this.filmsSection.element);
       render(new NoFeatureView(),this.filmsListSection.element);
@@ -55,32 +51,23 @@ export class BoardPresenter {
     this.#renderFeatureList();
   };
 
-  #sortTasks = (sortType) => {
-    // 2. Этот исходный массив задач необходим,
-    // потому что для сортировки мы будем мутировать
-    // массив в свойстве _boardTasks
-    switch (sortType) {
+  get features() {
+    switch (this.#currentSortType) {
       case SortType.DATE:
-        this.#boardFeatures.sort(sortDateDown);
-        break;
-      case SortType.RATING:
-        this.#boardFeatures.sort(sortRatingDown);
-        break;
-      default:
-        // 3. А когда пользователь захочет "вернуть всё, как было",
-        // мы просто запишем в _boardTasks исходный массив
-        this.#boardFeatures = [...this.#sourcedBoardFeatures];
-    }
+        return this.#featureModel.features.sort(sortDateDown);
 
-    this.#currentSortType = sortType;
-  };
+      case SortType.RATING:
+        return this.#featureModel.features.sort(sortRatingDown);
+    }
+    return this.#featureModel.features;
+  }
 
   #handleSortTypeChange = (sortType) => {
     // - Сортируем задачи
     if (this.#currentSortType === sortType) {
       return;
     }
-    this.#sortTasks(sortType);
+    this.#currentSortType = sortType;
     // - Очищаем список
     this.#clearFeatureList();
     // - Рендерим список заново
@@ -93,29 +80,74 @@ export class BoardPresenter {
   };
 
   #renderFeatureList = () => {
-    this.#renderFeatures(0, Math.min(this.#boardFeatures.length, TASK_COUNT_PER_STEP));
-    if (this.#boardFeatures.length > TASK_COUNT_PER_STEP) {
+    const featureCount=this.features.length;
+    const features=this.features.slice(0, Math.min(featureCount, TASK_COUNT_PER_STEP));
+
+    this.#renderFeatures(features);
+
+    if (featureCount > TASK_COUNT_PER_STEP) {
       this.#renderLoadMoreButton();
     }
   };
 
-  #renderFeatures = (from, to) => {
-    this.#boardFeatures
-      .slice(from, to)
-      .forEach((task) => this.#renderFeature(task));
+  #renderFeatures = (features) => {
+    features.forEach((feature)=>this.#renderFeature(feature));
   };
+
 
   #renderFeature(task) {
     const comments = this.#featureModel.getCommentForFeature(task.id);
-    const filmPresenter = new FilmPresenter(this.filmsListContainer.element,comments,this.#handleFeatureChange,this.#handleOpenPopup);
+    const filmPresenter = new FilmPresenter(this.filmsListContainer.element,comments,this.#handleViewAction,this.#handleOpenPopup);
     filmPresenter.init(task);
     this.#filmPresenter.set(task.id,filmPresenter);
   }
 
-  #handleFeatureChange = (updatedTask) => {
-    this.#boardFeatures = updateItem(this.#boardFeatures, updatedTask);
-    this.#sourcedBoardFeatures = updateItem(this.#sourcedBoardFeatures, updatedTask);
-    this.#filmPresenter.get(updatedTask.id).init(updatedTask);
+  //Метод к-й был у нас до изспользования паттерна Observerbal
+
+  // #handleFeatureChange = (updatedTask) => {
+  //   this.#boardFeatures = updateItem(this.#boardFeatures, updatedTask);
+  //   this.#sourcedBoardFeatures = updateItem(this.#sourcedBoardFeatures, updatedTask);
+  //   this.#filmPresenter.get(updatedTask.id).init(updatedTask);
+  // };
+
+  //Новый метод-обработчик пользовательского действия
+  #handleViewAction = (actionType, updateType, update) => {
+    console.log(actionType, updateType, update);
+    // Здесь будем вызывать обновление модели.
+    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
+    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
+    // update - обновленные данные
+    // switch (actionType) {
+    //   case UserAction.UPDATE_TASK:
+    //     this.#featureModel.updateItem(updateType, update);
+    //     break;
+    // case UserAction.ADD_TASK:
+    //   this.#tasksModel.addTask(updateType, update);
+    //   break;
+    // case UserAction.DELETE_TASK:
+    //   this.#tasksModel.deleteTask(updateType, update);
+    //   break;
+    // }
+  };
+
+  #handleModelEvent = (updateType, data) => {
+    console.log(updateType, data);
+    // В зависимости от типа изменений решаем, что делать:
+    // - обновить часть списка (например, когда поменялось описание)
+    // - обновить список (например, когда задача ушла в архив)
+    // - обновить всю доску (например, при переключении фильтра)
+    // switch (updateType) {
+    // case UpdateType.PATCH:
+    // - обновить часть списка (например, когда поменялось описание)
+    // this.#filmPresenter.get(data.id).init(data);
+    //   break;
+    // case UpdateType.MINOR:
+    // - обновить список (например, когда задача ушла в архив)
+    // break;
+    // case UpdateType.MAJOR:
+    // - обновить всю доску (например, при переключении фильтра)
+    // break;
+    // }
   };
 
   #handleOpenPopup = () => {
@@ -137,10 +169,18 @@ export class BoardPresenter {
   };
 
   #handleLoadMoreButtonClick = () => {
-    this.#renderFeatures(this.#renderedFeatureCount, this.#renderedFeatureCount + TASK_COUNT_PER_STEP);
-    this.#renderedFeatureCount += TASK_COUNT_PER_STEP;
+    // this.#renderFeatures(this.#renderedFeatureCount, this.#renderedFeatureCount + TASK_COUNT_PER_STEP);
+    // this.#renderedFeatureCount += TASK_COUNT_PER_STEP;
 
-    if (this.#renderedFeatureCount >= this.#boardFeatures.length) {
+    const featureCount=this.features.length;
+
+    const newRenderedFeatureCount = Math.min(featureCount, this.#renderedFeatureCount + TASK_COUNT_PER_STEP);
+    const features = this.features.slice(this.#renderedFeatureCount, newRenderedFeatureCount);
+
+    this.#renderFeatures(features);
+    this.#renderedFeatureCount = newRenderedFeatureCount;
+
+    if (this.#renderedFeatureCount >= featureCount) {
       remove(this.#loadMoreButtonComponent);
     }
   };
