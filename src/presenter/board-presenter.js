@@ -34,7 +34,8 @@ export class BoardPresenter {
     this.#featureModel = featureModel;
     this.#filterFeatures=filterFeatures;
 
-    // this.#featureModel.addObserver(this.#handleModelEvent);
+    this.#featureModel.addObserver(this.#handleModelEvent);
+
 
     if (this.features.every((film)=>film.isArchive)) {
       render(this.filmsSection, this.#boardContainer);
@@ -42,7 +43,7 @@ export class BoardPresenter {
       render(new NoFeatureView(),this.filmsListSection.element);
     }
     else {
-      render(new NewFilterView(this.#filterFeatures), siteMainElement);
+      // render(new NewFilterView(this.#filterFeatures), siteMainElement);
       this.#renderSort();
       render(this.filmsSection, this.#boardContainer);
       render(this.filmsListSection, this.filmsSection.element);
@@ -117,17 +118,17 @@ export class BoardPresenter {
     // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
     // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
     // update - обновленные данные
-    // switch (actionType) {
-    //   case UserAction.UPDATE_TASK:
-    //     this.#featureModel.updateItem(updateType, update);
-    //     break;
+    switch (actionType) {
+      case UserAction.UPDATE_TASK:
+        this.#featureModel.updateItem(updateType,  update);
+        break;
     // case UserAction.ADD_TASK:
     //   this.#tasksModel.addTask(updateType, update);
     //   break;
     // case UserAction.DELETE_TASK:
     //   this.#tasksModel.deleteTask(updateType, update);
     //   break;
-    // }
+    }
   };
 
   #handleModelEvent = (updateType, data) => {
@@ -136,18 +137,21 @@ export class BoardPresenter {
     // - обновить часть списка (например, когда поменялось описание)
     // - обновить список (например, когда задача ушла в архив)
     // - обновить всю доску (например, при переключении фильтра)
-    // switch (updateType) {
-    // case UpdateType.PATCH:
+    switch (updateType) {
+    case UpdateType.PATCH:
+      // this.#filmPresenter.get(data.id).init(data);
     // - обновить часть списка (например, когда поменялось описание)
-    // this.#filmPresenter.get(data.id).init(data);
-    //   break;
-    // case UpdateType.MINOR:
-    // - обновить список (например, когда задача ушла в архив)
-    // break;
-    // case UpdateType.MAJOR:
+    break;
+    case UpdateType.MINOR:
+      this.#clearFeatureList();
+      this.#renderFeatureList();
+      // this.#filmPresenter.get(data.id).init(data);
+      // - обновить список (например, когда задача ушла в архив)
+    break;
+    case UpdateType.MAJOR:
     // - обновить всю доску (например, при переключении фильтра)
-    // break;
-    // }
+    break;
+    }
   };
 
   #handleOpenPopup = () => {
@@ -169,9 +173,6 @@ export class BoardPresenter {
   };
 
   #handleLoadMoreButtonClick = () => {
-    // this.#renderFeatures(this.#renderedFeatureCount, this.#renderedFeatureCount + TASK_COUNT_PER_STEP);
-    // this.#renderedFeatureCount += TASK_COUNT_PER_STEP;
-
     const featureCount=this.features.length;
 
     const newRenderedFeatureCount = Math.min(featureCount, this.#renderedFeatureCount + TASK_COUNT_PER_STEP);

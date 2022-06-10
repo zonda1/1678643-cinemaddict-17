@@ -14,6 +14,10 @@ export class FeatureModel extends Observable {
 
   getCommentForFeature(id) {return this.#comments.filter((comment)=>comment.id===id);}
 
+  setFeatures(features) {
+    this.#features=features;
+  }
+
   updateItem = (updateType, update) => {
     const index = this.#features.findIndex((item) => item.id === update.id);
 
