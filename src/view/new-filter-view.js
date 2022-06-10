@@ -6,7 +6,8 @@ const createNewFilterItemTemplate = (filter,currentFilterType) => {
   if (name ==='All') {
     return (`
     <a href="#${name}"
-    ${type === currentFilterType ? 'checked' : ''} class="main-navigation__item">${makeUpperCaseFirst(name)}</a>
+    ${type === currentFilterType ? 'checked' : ''} class="main-navigation__item">${makeUpperCaseFirst(name)}
+    </a>
   `);}
   return (`
   <a href="#${name}"

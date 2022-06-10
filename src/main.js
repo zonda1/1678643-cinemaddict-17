@@ -17,10 +17,10 @@ const comments = features.flatMap((film)=>Array.from({length: 10}, ()=>generateF
 
 const boardPresenter=new BoardPresenter();
 const featureModel=new FeatureModel(features,comments);
-const fiterModel=new FilterModel();
+const filterModel=new FilterModel();
 
-const filterPresenter=new FilterPresenter(siteMainElement,fiterModel,featureModel);
+const filterPresenter=new FilterPresenter(siteMainElement,filterModel,featureModel);
 render(new NewUserLogoView(), siteHeaderElement);
 filterPresenter.init();
-boardPresenter.init(siteMainElement,featureModel,filterPresenter);
+boardPresenter.init(siteMainElement,featureModel,filterModel);
 

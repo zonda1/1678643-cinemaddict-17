@@ -51,7 +51,7 @@ export default class FilterPresenter {
     const filters = this.filters;
     const prevFilterComponent = this.#filterComponent;
 
-    this.#filterComponent = new NewFilterView(filters);
+    this.#filterComponent = new NewFilterView(filters,this.#filterModel.filter);
     this.#filterComponent.setFilterTypeChangeHandler(this.#handleFilterTypeChange);
 
     if (prevFilterComponent === null) {
@@ -72,7 +72,7 @@ export default class FilterPresenter {
       return;
     }
 
-    this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
+    this.#filterModel.setFilter(UpdateType.MINOR, filterType);
   };
 
 }

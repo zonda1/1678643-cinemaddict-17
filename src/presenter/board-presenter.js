@@ -9,6 +9,7 @@ import {NoFeatureView} from '../view/no-feature-view';
 import FilmPresenter from './film-presenter';
 import {sortDateDown,sortRatingDown} from '../utils.js';
 import { SortType,UserAction,UpdateType} from '../const/const.js';
+import {filter}  from '../mock/filter';
 
 const TASK_COUNT_PER_STEP = 5;
 
@@ -23,44 +24,52 @@ export class BoardPresenter {
   #loadMoreButtonComponent = new NewButtonView();
   #sortComponent=new NewSortView();
   #currentSortType=SortType.DEFAULT;
-  #filterFeatures=null;
+  #filterModel=null;
   #filmPresenter=new Map();
 
   #renderedFeatureCount = TASK_COUNT_PER_STEP;
 
-  init = (boardContainer,featureModel,filterFeatures) => {
+  init = (boardContainer,featureModel,filterModel) => {
 
     this.#boardContainer = boardContainer;
     this.#featureModel = featureModel;
-    this.#filterFeatures=filterFeatures;
+    this.#filterModel=filterModel;
 
     this.#featureModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
 
 
-    if (this.features.every((film)=>film.isArchive)) {
+    if (this.features.every((film)=>!film.id)) {
       render(this.filmsSection, this.#boardContainer);
       render(this.filmsListSection, this.filmsSection.element);
       render(new NoFeatureView(),this.filmsListSection.element);
     }
     else {
-      // render(new NewFilterView(this.#filterFeatures), siteMainElement);
+      // render(new NewFilterView(this.#filterModel), siteMainElement);
       this.#renderSort();
       render(this.filmsSection, this.#boardContainer);
       render(this.filmsListSection, this.filmsSection.element);
       render(this.filmsListContainer, this.filmsListSection.element);
     }
-    this.#renderFeatureList();
+    this.#renderBoard();
   };
 
   get features() {
+    // const filterType = this.#filterModel.filter;
+    // const features = this.#featureModel.features;
+    // const filteredTasks = filter[filterType](features);
+
     switch (this.#currentSortType) {
       case SortType.DATE:
         return this.#featureModel.features.sort(sortDateDown);
+        // return filteredTasks.features.sort(sortDateDown);
 
       case SortType.RATING:
         return this.#featureModel.features.sort(sortRatingDown);
+        // return filteredTasks.features.sort(sortRatingDown);
     }
     return this.#featureModel.features;
+    // return filteredTasks.features;
   }
 
   #handleSortTypeChange = (sortType) => {
@@ -72,7 +81,7 @@ export class BoardPresenter {
     // - Очищаем список
     this.#clearFeatureList();
     // - Рендерим список заново
-    this.#renderFeatureList();
+    this.#renderBoard();
   };
 
   #renderSort=()=> {
@@ -103,6 +112,31 @@ export class BoardPresenter {
     this.#filmPresenter.set(task.id,filmPresenter);
   }
 
+  #renderBoard = () => {
+    const features = this.features;
+    const taskCount = features.length;
+
+    // render(this.#boardComponent, this.#boardContainer);
+
+    // if (taskCount === 0) {
+    //   this.#renderNoTasks();
+    //   return;
+    // }
+
+    // this.#renderSort();
+    // render(this.#taskListComponent, this.#boardComponent.element);
+
+    // Теперь, когда #renderBoard рендерит доску не только на старте,
+    // но и по ходу работы приложения, нужно заменить
+    // константу TASK_COUNT_PER_STEP на свойство #renderedTaskCount,
+    // чтобы в случае перерисовки сохранить N-показанных карточек
+    this.#renderFeatures(features.slice(0, Math.min(taskCount, this.#renderedFeatureCount)));
+
+    if (taskCount > this.#renderedFeatureCount) {
+      this.#renderLoadMoreButton();
+    }
+  };
+
   //Метод к-й был у нас до изспользования паттерна Observerbal
 
   // #handleFeatureChange = (updatedTask) => {
@@ -123,10 +157,10 @@ export class BoardPresenter {
         this.#featureModel.updateItem(updateType,  update);
         break;
     // case UserAction.ADD_TASK:
-    //   this.#tasksModel.addTask(updateType, update);
+    //
     //   break;
     // case UserAction.DELETE_TASK:
-    //   this.#tasksModel.deleteTask(updateType, update);
+    //
     //   break;
     }
   };
@@ -138,19 +172,18 @@ export class BoardPresenter {
     // - обновить список (например, когда задача ушла в архив)
     // - обновить всю доску (например, при переключении фильтра)
     switch (updateType) {
-    case UpdateType.PATCH:
-      // this.#filmPresenter.get(data.id).init(data);
+    // case UpdateType.PATCH:
     // - обновить часть списка (например, когда поменялось описание)
-    break;
-    case UpdateType.MINOR:
-      this.#clearFeatureList();
-      this.#renderFeatureList();
-      // this.#filmPresenter.get(data.id).init(data);
-      // - обновить список (например, когда задача ушла в архив)
-    break;
-    case UpdateType.MAJOR:
+    // break;
+      case UpdateType.MINOR:
+        this.#clearFeatureList();
+        this.#renderBoard();
+        // this.#filmPresenter.get(data.id).init(data);
+        // - обновить список (например, когда задача ушла в архив)
+        break;
+    // case UpdateType.MAJOR:
     // - обновить всю доску (например, при переключении фильтра)
-    break;
+    // break;
     }
   };
 
@@ -160,10 +193,12 @@ export class BoardPresenter {
     }
   };
 
-  #clearFeatureList = () => {
+  #clearFeatureList = ({resetRenderedTaskCount = false} = {}) => {
     this.#filmPresenter.forEach((presenter) => presenter.destroy());
     this.#filmPresenter.clear();
-    this.#renderedFeatureCount = TASK_COUNT_PER_STEP;
+    if (resetRenderedTaskCount) {
+      this.#renderedFeatureCount = TASK_COUNT_PER_STEP;
+    }
     remove(this.#loadMoreButtonComponent);
   };
 
