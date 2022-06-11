@@ -22,8 +22,8 @@ export class BoardPresenter {
   filmsListSection = new NewFilmsListSectionView();
   filmsListContainer = new NewFilmsListContainerView();
   #loadMoreButtonComponent = new NewButtonView();
-  #sortComponent=new NewSortView();
   #currentSortType=SortType.DEFAULT;
+  #sortComponent=null;
   #filterModel=null;
   #filmPresenter=new Map();
 
@@ -38,20 +38,17 @@ export class BoardPresenter {
     this.#featureModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
 
-
     if (this.features.every((film)=>!film.id)) {
-      render(this.filmsSection, this.#boardContainer);
-      render(this.filmsListSection, this.filmsSection.element);
-      render(new NoFeatureView(),this.filmsListSection.element);
+
+    render(this.filmsSection, this.#boardContainer);
+    render(this.filmsListSection, this.filmsSection.element);
+    render(new NoFeatureView(),this.filmsListSection.element);
     }
     else {
       // render(new NewFilterView(this.#filterModel), siteMainElement);
-      this.#renderSort();
-      render(this.filmsSection, this.#boardContainer);
-      render(this.filmsListSection, this.filmsSection.element);
-      render(this.filmsListContainer, this.filmsListSection.element);
+      // this.#renderSort();
+      this.#renderBoard();
     }
-    this.#renderBoard();
   };
 
   get features() {
@@ -79,14 +76,16 @@ export class BoardPresenter {
     }
     this.#currentSortType = sortType;
     // - Очищаем список
-    this.#clearFeatureList();
+    // this.#clearFeatureList();
+    this.#clearBoard();
     // - Рендерим список заново
     this.#renderBoard();
   };
 
   #renderSort=()=> {
-    render(this.#sortComponent, siteMainElement);
+    this.#sortComponent = new NewSortView(this.#currentSortType);
     this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
+    render(this.#sortComponent, siteMainElement);
   };
 
   #renderFeatureList = () => {
@@ -106,11 +105,32 @@ export class BoardPresenter {
 
 
   #renderFeature(task) {
+    // const comments = this.#featureModel.getCommentForFeature(task.id);
+    // const filmPresenter = new FilmPresenter(this.filmsListContainer.element,this.#handleViewAction,this.#handleOpenPopup);
+    // filmPresenter.init(task,comments);
+    // this.#filmPresenter.set(task.id,filmPresenter);
     const comments = this.#featureModel.getCommentForFeature(task.id);
-    const filmPresenter = new FilmPresenter(this.filmsListContainer.element,comments,this.#handleViewAction,this.#handleOpenPopup);
-    filmPresenter.init(task);
+    const filmPresenter =this.#filmPresenter.has(task.id)?this.#filmPresenter.get(task.id): new FilmPresenter(this.filmsListContainer.element,this.#handleViewAction,this.#handleOpenPopup);
+    filmPresenter.init(task,comments);
     this.#filmPresenter.set(task.id,filmPresenter);
   }
+
+  #clearFeatureList = ({resetRenderedTaskCount = false} = {}) => {
+    this.#filmPresenter.forEach((presenter) => presenter.destroy());
+    // this.#filmPresenter.clear();
+    if (resetRenderedTaskCount) {
+      this.#renderedFeatureCount = TASK_COUNT_PER_STEP;
+    }
+    remove(this.#loadMoreButtonComponent);
+  };
+
+  #clearBoard=({resetSortType = false} = {})=> {
+    this.#clearFeatureList();
+    remove(this.#sortComponent);
+    if (resetSortType) {
+      this.#currentSortType = SortType.DEFAULT;
+    }
+  };
 
   #renderBoard = () => {
     const features = this.features;
@@ -123,7 +143,10 @@ export class BoardPresenter {
     //   return;
     // }
 
-    // this.#renderSort();
+    this.#renderSort();
+    render(this.filmsSection, this.#boardContainer);
+    render(this.filmsListSection, this.filmsSection.element);
+    render(this.filmsListContainer, this.filmsListSection.element);
     // render(this.#taskListComponent, this.#boardComponent.element);
 
     // Теперь, когда #renderBoard рендерит доску не только на старте,
@@ -176,7 +199,8 @@ export class BoardPresenter {
     // - обновить часть списка (например, когда поменялось описание)
     // break;
       case UpdateType.MINOR:
-        this.#clearFeatureList();
+        // this.#clearFeatureList();
+        this.#clearBoard({resetSortType: true});
         this.#renderBoard();
         // this.#filmPresenter.get(data.id).init(data);
         // - обновить список (например, когда задача ушла в архив)
@@ -191,15 +215,6 @@ export class BoardPresenter {
     for (const presenter of this.#filmPresenter.values()) {
       presenter.closePopup();
     }
-  };
-
-  #clearFeatureList = ({resetRenderedTaskCount = false} = {}) => {
-    this.#filmPresenter.forEach((presenter) => presenter.destroy());
-    this.#filmPresenter.clear();
-    if (resetRenderedTaskCount) {
-      this.#renderedFeatureCount = TASK_COUNT_PER_STEP;
-    }
-    remove(this.#loadMoreButtonComponent);
   };
 
   #renderLoadMoreButton = () => {

@@ -13,15 +13,15 @@ export default class FilmPresenter {
   #changeData = null;
   #handleOpenPopup=null;
 
-  constructor(filmsListContainer,popupComments,changeData,handleOpenPopup) {
+  constructor(filmsListContainer,changeData,handleOpenPopup) {
     this.#filmsListContainer = filmsListContainer;
-    this.#popupComments=popupComments;
     this.#changeData=changeData;
     this.#handleOpenPopup=handleOpenPopup;
   }
 
-  init = (task) => {
+  init = (task,popupComments) => {
     this.#task = task;
+    this.#popupComments=popupComments;
     const prevFeatureComponent=this.#featureComponent;
     this.#featureComponent= new NewFilmCardView(task);
     this.#featureComponent.setClickPopupOpener(()=>{
@@ -34,22 +34,22 @@ export default class FilmPresenter {
 
     if (prevFeatureComponent===null) {
       render(this.#featureComponent, this.#filmsListContainer);
-      return;
+    } else {
+      if (this.#filmsListContainer.contains(prevFeatureComponent.element)) {
+        replace(this.#featureComponent,prevFeatureComponent);
+      }
+      remove(prevFeatureComponent);
     }
     //Чтобы увидеть измененное состояние кнопок, мы удаляем текущий компонент и рендерим новый
     if (this.#popupComponent) {
       this.#onCloseButtonClick();
       this.#renderPopup();
     }
-
-    if (this.#filmsListContainer.contains(prevFeatureComponent.element)) {
-      replace(this.#featureComponent,prevFeatureComponent);
-    }
-    remove(prevFeatureComponent);
   };
 
   destroy=()=>{
     remove(this.#featureComponent);
+    this.#featureComponent=null;
   };
 
   closePopup=()=>{
