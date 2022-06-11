@@ -55,21 +55,21 @@ export class BoardPresenter {
   };
 
   get features() {
-    // const filterType = this.#filterModel.filter;
-    // const features = this.#featureModel.features;
-    // const filteredTasks = filter[filterType](features);
+    const filterType = this.#filterModel.filter;
+    const features = this.#featureModel.features;
+    const filteredTasks = filter[filterType](features);
 
     switch (this.#currentSortType) {
       case SortType.DATE:
-        return this.#featureModel.features.sort(sortDateDown);
-        // return filteredTasks.features.sort(sortDateDown);
+        // return this.#featureModel.features.sort(sortDateDown);
+        return filteredTasks.sort(sortDateDown);
 
       case SortType.RATING:
-        return this.#featureModel.features.sort(sortRatingDown);
-        // return filteredTasks.features.sort(sortRatingDown);
+        // return this.#featureModel.features.sort(sortRatingDown);
+        return filteredTasks.sort(sortRatingDown);
     }
-    return this.#featureModel.features;
-    // return filteredTasks.features;
+    // return this.#featureModel.features;
+    return filteredTasks;
   }
 
   #handleSortTypeChange = (sortType) => {

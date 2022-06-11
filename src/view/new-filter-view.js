@@ -1,17 +1,18 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import { makeUpperCaseFirst } from '../utils.js';
+import { FilterType } from '../const/const.js';
 
 const createNewFilterItemTemplate = (filter,currentFilterType) => {
   const {type,name,count}=filter;
   if (name ==='All') {
     return (`
     <a href="#${name}"
-    ${type === currentFilterType ? 'checked' : ''} class="main-navigation__item">${makeUpperCaseFirst(name)}
+    ${type === currentFilterType ? 'checked' : ''} class="main-navigation__item" data-filter-type=${FilterType.ALL}>${name}
     </a>
   `);}
   return (`
   <a href="#${name}"
-  ${type === currentFilterType ? 'checked' : ''}class="main-navigation__item">${makeUpperCaseFirst(name)} <span class="main-navigation__item-count">${count}</span></a>
+  ${type === currentFilterType ? 'checked' : ''}class="main-navigation__item" data-filter-type=${type}>${name} <span class="main-navigation__item-count">${count}</span></a>
 `);
 };
 
@@ -40,11 +41,11 @@ export class NewFilterView extends AbstractView {
 
   setFilterTypeChangeHandler = (callback) => {
     this._callback.filterTypeChange = callback;
-    this.element.addEventListener('change', this.#filterTypeChangeHandler);
+    this.element.addEventListener('click', this.#filterTypeChangeHandler);
   };
 
   #filterTypeChangeHandler = (evt) => {
     evt.preventDefault();
-    this._callback.filterTypeChange(evt.target.value);
+    this._callback.filterTypeChange(evt.target.dataset.filterType);
   };
 }
