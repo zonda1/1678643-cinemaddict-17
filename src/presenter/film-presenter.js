@@ -64,9 +64,15 @@ export default class FilmPresenter {
     this.#popupComponent.setComments(this.#popupComments);
     document.body.append(this.#popupComponent.element);
 
+    console.log(this.#popupComments);
+
     this.#popupComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
     this.#popupComponent.setWatchedClickHandler(this.#handleWatchedClick);
     this.#popupComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
+
+    this.#popupComponent.setCommentDeleateClickHandler(this.#handleDeleateCommentClick);
+    this.#popupComponent.setFormSubmitHandler(this.#handleAddComment);
+
     document.body.classList.add('hide-overflow');
     document.addEventListener('keydown',this.#onEscKeyDown);
     this.#popupComponent.setClickPopupCloser(this.#onCloseButtonClick);
@@ -106,4 +112,16 @@ export default class FilmPresenter {
       UpdateType.MINOR,
       {...this.#task, userDetails:{...this.#task.userDetails,favorite: !this.#task.userDetails.favorite}});
   };
+
+  //Колбэк для удаления комментария
+  #handleDeleateCommentClick=(features)=> {
+    this.#changeData(UserAction.DELETE_TASK,
+      UpdateType.PATCH,
+      features.comments);
+  };
+
+  //Колбэк для добавления комментария
+  #handleAddComment=(features)=>{
+  };
+
 }

@@ -18,6 +18,7 @@ const siteMainElement=document.querySelector('.main');
 export class BoardPresenter {
   #boardContainer=null;
   #featureModel=null;
+  #commentModel=null;
   filmsSection = new NewFilmsSectionView();
   filmsListSection = new NewFilmsListSectionView();
   filmsListContainer = new NewFilmsListContainerView();
@@ -29,20 +30,21 @@ export class BoardPresenter {
 
   #renderedFeatureCount = TASK_COUNT_PER_STEP;
 
-  init = (boardContainer,featureModel,filterModel) => {
+  init = (boardContainer,featureModel,commentModel,filterModel) => {
 
     this.#boardContainer = boardContainer;
     this.#featureModel = featureModel;
+    this.#commentModel = commentModel;
     this.#filterModel=filterModel;
 
     this.#featureModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
+    this.#commentModel.addObserver(this.#handleModelEvent);
 
     if (this.features.every((film)=>!film.id)) {
-
-    render(this.filmsSection, this.#boardContainer);
-    render(this.filmsListSection, this.filmsSection.element);
-    render(new NoFeatureView(),this.filmsListSection.element);
+      render(this.filmsSection, this.#boardContainer);
+      render(this.filmsListSection, this.filmsSection.element);
+      render(new NoFeatureView(),this.filmsListSection.element);
     }
     else {
       // render(new NewFilterView(this.#filterModel), siteMainElement);
@@ -109,10 +111,11 @@ export class BoardPresenter {
     // const filmPresenter = new FilmPresenter(this.filmsListContainer.element,this.#handleViewAction,this.#handleOpenPopup);
     // filmPresenter.init(task,comments);
     // this.#filmPresenter.set(task.id,filmPresenter);
-    const comments = this.#featureModel.getCommentForFeature(task.id);
+    const comments = this.#commentModel.getCommentForFeature(task.id);
     const filmPresenter =this.#filmPresenter.has(task.id)?this.#filmPresenter.get(task.id): new FilmPresenter(this.filmsListContainer.element,this.#handleViewAction,this.#handleOpenPopup);
     filmPresenter.init(task,comments);
     this.#filmPresenter.set(task.id,filmPresenter);
+    console.log(this.#filmPresenter);
   }
 
   #clearFeatureList = ({resetRenderedTaskCount = false} = {}) => {
@@ -182,9 +185,9 @@ export class BoardPresenter {
     // case UserAction.ADD_TASK:
     //
     //   break;
-    // case UserAction.DELETE_TASK:
-    //
-    //   break;
+    case UserAction.DELETE_TASK:
+      this.#commentModel.deleateItem(updateType,  update);
+      break;
     }
   };
 
@@ -195,9 +198,9 @@ export class BoardPresenter {
     // - обновить список (например, когда задача ушла в архив)
     // - обновить всю доску (например, при переключении фильтра)
     switch (updateType) {
-    // case UpdateType.PATCH:
+    case UpdateType.PATCH:
     // - обновить часть списка (например, когда поменялось описание)
-    // break;
+    break;
       case UpdateType.MINOR:
         // this.#clearFeatureList();
         this.#clearBoard({resetSortType: true});

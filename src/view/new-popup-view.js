@@ -156,8 +156,13 @@ export class NewPopupView extends AbstractStatefulView {
     this.updateElement({comments:comments});
   }
 
+  deleateComment() {
+    super.removeElement();
+  }
+
   static parseFeaturesToState = (feature) => ({...feature,
-    chosenEmotion: null
+    chosenEmotion: null,
+    newComment:null
   });
 
   static parseStateToFeatures = (state) => {
@@ -185,6 +190,10 @@ export class NewPopupView extends AbstractStatefulView {
     for (let i=0; i<buttons.length; i++) {
       buttons[i].addEventListener('change',this.#emotionPickHandler);
     }
+    // const buttonDeleate=this.element.querySelectorAll('.film-details__comment-delete');
+    // for (let i=0; i<buttonDeleate.length; i++) {
+    //   buttonDeleate[i].addEventListener('click',()=>{buttonDeleate[i].parentElement.deleateComment();});
+    // }
   };
 
   #emotionPickHandler = (evt) => {
@@ -216,6 +225,21 @@ export class NewPopupView extends AbstractStatefulView {
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoriteClickHandler);
   };
 
+  setCommentDeleateClickHandler = (callback) => {
+    this._callback.deleateCommentClick = callback;
+    const buttonDeleate=this.element.querySelectorAll('.film-details__comment-delete');
+    for (let i=0; i<buttonDeleate.length; i++) {
+      buttonDeleate[i].addEventListener('click',this.#commentDeleateClickHandler);
+    }
+    // this.element.querySelectorAll('.film-details__comment-delete').addEventListener('click', this.#commentDeleateClickHandler);
+  };
+
+  //Обработчик отправки формы
+  setFormSubmitHandler = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.querySelector('form').addEventListener('submit', this.#newCommentInput);
+  };
+
   #watchlistClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.watchlistClick();
@@ -231,6 +255,22 @@ export class NewPopupView extends AbstractStatefulView {
     this._callback.favoriteClick();
   };
 
+  #commentDeleateClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.deleateCommentClick(NewPopupView.parseStateToFeatures(this._state));
+  };
+
+  // #formSubmitHandler = (evt) => {
+  //   evt.preventDefault();
+  //   this._callback.formSubmit(NewPopupView.parseStateToTask(this._state));
+  // };
+
+  #newCommentInput = (evt) => {
+    evt.preventDefault();
+    this.updateElement({
+      newComment: this.element.querySelector('.film-details__comment-input').value
+    });
+  };
 
   #clickClosePopupHandler = (evt) => {
     evt.preventDefault();

@@ -1,18 +1,13 @@
 import Observable from '../framework/observable';
 export class FeatureModel extends Observable {
   #features=null;
-  #comments=null;
 
-  constructor (features,comments) {
+  constructor (features) {
     super();
     this.#features=features;
-    this.#comments=comments;
   }
 
   get features() {return this.#features;}
-  get comments() {return this.#comments;}
-
-  getCommentForFeature(id) {return this.#comments.filter((comment)=>comment.id===id);}
 
   setFeatures(features) {
     this.#features=features;
