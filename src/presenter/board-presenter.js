@@ -1,4 +1,4 @@
-import {NewFilterView} from '../view/new-filter-view.js';
+// import {NewFilterView} from '../view/new-filter-view.js';
 import {NewSortView} from '../view/new-sort-view.js';
 import {NewFilmsSectionView} from '../view/new-films-section-view';
 import {NewFilmsListSectionView} from '../view/new-films-list-section-view';
@@ -10,6 +10,7 @@ import FilmPresenter from './film-presenter';
 import {sortDateDown,sortRatingDown} from '../utils.js';
 import { SortType,UserAction,UpdateType} from '../const/const.js';
 import {filter}  from '../mock/filter';
+import LoadingView from '../view/loading-view.js';
 
 const TASK_COUNT_PER_STEP = 5;
 
@@ -23,10 +24,13 @@ export class BoardPresenter {
   filmsListSection = new NewFilmsListSectionView();
   filmsListContainer = new NewFilmsListContainerView();
   #loadMoreButtonComponent = new NewButtonView();
+  #loadingComponent = new LoadingView();
+  #noFeatureComponent=new NoFeatureView();
   #currentSortType=SortType.DEFAULT;
   #sortComponent=null;
   #filterModel=null;
   #filmPresenter=new Map();
+  #isLoading = true;
 
   #renderedFeatureCount = TASK_COUNT_PER_STEP;
 
@@ -34,23 +38,14 @@ export class BoardPresenter {
 
     this.#boardContainer = boardContainer;
     this.#featureModel = featureModel;
-    this.#commentModel = commentModel;
     this.#filterModel=filterModel;
+    this.#commentModel = commentModel;
 
     this.#featureModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
     this.#commentModel.addObserver(this.#handleModelEvent);
 
-    if (this.features.every((film)=>!film.id)) {
-      render(this.filmsSection, this.#boardContainer);
-      render(this.filmsListSection, this.filmsSection.element);
-      render(new NoFeatureView(),this.filmsListSection.element);
-    }
-    else {
-      // render(new NewFilterView(this.#filterModel), siteMainElement);
-      // this.#renderSort();
-      this.#renderBoard();
-    }
+    this.#renderBoard();
   };
 
   get features() {
@@ -106,16 +101,18 @@ export class BoardPresenter {
   };
 
 
-  #renderFeature(task) {
-    // const comments = this.#featureModel.getCommentForFeature(task.id);
+  #renderFeature(feature) {
+    // const comments = this.#featureModel.getCommentForFeature(feature.id);
     // const filmPresenter = new FilmPresenter(this.filmsListContainer.element,this.#handleViewAction,this.#handleOpenPopup);
-    // filmPresenter.init(task,comments);
-    // this.#filmPresenter.set(task.id,filmPresenter);
-    const comments = this.#commentModel.getCommentForFeature(task.id);
-    const filmPresenter =this.#filmPresenter.has(task.id)?this.#filmPresenter.get(task.id): new FilmPresenter(this.filmsListContainer.element,this.#handleViewAction,this.#handleOpenPopup);
-    filmPresenter.init(task,comments);
-    this.#filmPresenter.set(task.id,filmPresenter);
-    console.log(this.#filmPresenter);
+
+
+    // filmPresenter.init(feature,comments);
+    // this.#filmPresenter.set(feature.id,filmPresenter);
+    // const comments = this.#commentModel.getCommentForFeature(feature.id);
+    const filmPresenter =this.#filmPresenter.has(feature.id)?this.#filmPresenter.get(feature.id): new FilmPresenter(this.filmsListContainer.element,this.#handleViewAction,this.#handleOpenPopup);
+    // filmPresenter.init(feature,comments);
+    filmPresenter.init(feature);
+    this.#filmPresenter.set(feature.id,filmPresenter);
   }
 
   #clearFeatureList = ({resetRenderedTaskCount = false} = {}) => {
@@ -135,30 +132,38 @@ export class BoardPresenter {
     }
   };
 
+  #renderNoFeature() {
+    render(this.#noFeatureComponent,this.filmsListSection.element);
+  }
+
+  #renderLoading = () => {
+    render(this.filmsSection, this.#boardContainer);
+    render(this.filmsListSection, this.filmsSection.element);
+    render(this.#loadingComponent, this.filmsListSection.element);
+  };
+
   #renderBoard = () => {
+
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
     const features = this.features;
-    const taskCount = features.length;
+    const featureCount = features.length;
 
-    // render(this.#boardComponent, this.#boardContainer);
-
-    // if (taskCount === 0) {
-    //   this.#renderNoTasks();
-    //   return;
-    // }
+    if (featureCount === 0) {
+      this.#renderNoFeature();
+      return;
+    }
 
     this.#renderSort();
     render(this.filmsSection, this.#boardContainer);
     render(this.filmsListSection, this.filmsSection.element);
     render(this.filmsListContainer, this.filmsListSection.element);
-    // render(this.#taskListComponent, this.#boardComponent.element);
+    this.#renderFeatures(features.slice(0, Math.min(featureCount, this.#renderedFeatureCount)));
 
-    // Теперь, когда #renderBoard рендерит доску не только на старте,
-    // но и по ходу работы приложения, нужно заменить
-    // константу TASK_COUNT_PER_STEP на свойство #renderedTaskCount,
-    // чтобы в случае перерисовки сохранить N-показанных карточек
-    this.#renderFeatures(features.slice(0, Math.min(taskCount, this.#renderedFeatureCount)));
-
-    if (taskCount > this.#renderedFeatureCount) {
+    if (featureCount > this.#renderedFeatureCount) {
       this.#renderLoadMoreButton();
     }
   };
@@ -173,7 +178,7 @@ export class BoardPresenter {
 
   //Новый метод-обработчик пользовательского действия
   #handleViewAction = (actionType, updateType, update) => {
-    console.log(actionType, updateType, update);
+    // console.log(actionType, updateType, update);
     // Здесь будем вызывать обновление модели.
     // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
     // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
@@ -192,11 +197,7 @@ export class BoardPresenter {
   };
 
   #handleModelEvent = (updateType, data) => {
-    console.log(updateType, data);
-    // В зависимости от типа изменений решаем, что делать:
-    // - обновить часть списка (например, когда поменялось описание)
-    // - обновить список (например, когда задача ушла в архив)
-    // - обновить всю доску (например, при переключении фильтра)
+    // console.log(updateType, data);
     switch (updateType) {
     case UpdateType.PATCH:
     // - обновить часть списка (например, когда поменялось описание)
@@ -211,6 +212,11 @@ export class BoardPresenter {
     // case UpdateType.MAJOR:
     // - обновить всю доску (например, при переключении фильтра)
     // break;
+    case UpdateType.INIT:
+      this.#isLoading = false;
+      remove(this.#loadingComponent);
+      this.#renderBoard();
+    break;
     }
   };
 

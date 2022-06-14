@@ -21,6 +21,7 @@ const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 const EMOTIONS = ['smile', 'sleeping', 'puke', 'angry'];

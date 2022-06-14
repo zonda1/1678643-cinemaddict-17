@@ -64,7 +64,7 @@ export default class FilmPresenter {
     this.#popupComponent.setComments(this.#popupComments);
     document.body.append(this.#popupComponent.element);
 
-    console.log(this.#popupComments);
+    // console.log(this.#popupComments);
 
     this.#popupComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
     this.#popupComponent.setWatchedClickHandler(this.#handleWatchedClick);
