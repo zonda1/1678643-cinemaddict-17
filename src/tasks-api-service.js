@@ -11,6 +11,11 @@ export default class FeaturesApiService extends ApiService {
       .then(ApiService.parseResponse);
   }
 
+  get comments() {
+    return this._load({url: 'comments/0'})
+      .then(ApiService.parseResponse);
+  }
+
   updateFeature = async (feature) => {
     const response = await this._load({
       url: `movies/${feature.id}`,

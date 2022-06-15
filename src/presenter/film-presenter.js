@@ -2,6 +2,9 @@ import {NewFilmCardView} from '../view/new-film-card-view.js';
 import {NewPopupView} from '../view/new-popup-view.js';
 import {render,replace,remove} from '../framework/render.js';
 import {UserAction,UpdateType} from '../const/const.js';
+import FeaturesApiService from '../tasks-api-service.js';
+import { AUTHORIZATION } from '../const/const.js';
+import { END_POINT } from '../const/const.js';
 
 export default class FilmPresenter {
 

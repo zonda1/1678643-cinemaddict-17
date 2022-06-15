@@ -47,7 +47,7 @@ const createAllCommentsTemplate=(comments)=>{
 
 
 const createNewPopupTemplate = (feature) => {
-  const {title,alternativeTitle,posters, description, runtime, genre,director,writers,actors} = feature.filmInfo;
+  const {title,alternativeTitle,poster, description, runtime, genre,director,writers,actors,totalRating,ageRating} = feature.filmInfo;
   const {date}=feature.filmInfo.release;
   const {comments=[]}=feature;
   const {chosenEmotion}=feature;
@@ -64,9 +64,9 @@ const createNewPopupTemplate = (feature) => {
     </div>
     <div class="film-details__info-wrap">
       <div class="film-details__poster">
-        <img class="film-details__poster-img" src="${posters}" alt="">
+        <img class="film-details__poster-img" src=${poster} alt="">
 
-        <p class="film-details__age">18+</p>
+        <p class="film-details__age">${ageRating}+</p>
       </div>
 
       <div class="film-details__info">
@@ -77,7 +77,7 @@ const createNewPopupTemplate = (feature) => {
           </div>
 
           <div class="film-details__rating">
-            <p class="film-details__total-rating">8.9</p>
+            <p class="film-details__total-rating">${totalRating}</p>
           </div>
         </div>
 

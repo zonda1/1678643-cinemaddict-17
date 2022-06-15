@@ -43,7 +43,7 @@ export class BoardPresenter {
 
     this.#featureModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
-    this.#commentModel.addObserver(this.#handleModelEvent);
+    // this.#commentModel.addObserver(this.#handleModelEvent);
 
     this.#renderBoard();
   };
@@ -102,7 +102,10 @@ export class BoardPresenter {
 
 
   #renderFeature(feature) {
-    // const comments = this.#featureModel.getCommentForFeature(feature.id);
+    // const comments = this.#commentModel.getCommentForFeature(feature.id);
+    // const comments = this.#commentModel.init();
+    this.#commentModel.init();
+    console.log(this.#commentModel.comments);
     // const filmPresenter = new FilmPresenter(this.filmsListContainer.element,this.#handleViewAction,this.#handleOpenPopup);
 
 
@@ -110,8 +113,8 @@ export class BoardPresenter {
     // this.#filmPresenter.set(feature.id,filmPresenter);
     // const comments = this.#commentModel.getCommentForFeature(feature.id);
     const filmPresenter =this.#filmPresenter.has(feature.id)?this.#filmPresenter.get(feature.id): new FilmPresenter(this.filmsListContainer.element,this.#handleViewAction,this.#handleOpenPopup);
-    // filmPresenter.init(feature,comments);
-    filmPresenter.init(feature);
+    filmPresenter.init(feature,comments);
+    // filmPresenter.init(feature);
     this.#filmPresenter.set(feature.id,filmPresenter);
   }
 
@@ -187,21 +190,21 @@ export class BoardPresenter {
       case UserAction.UPDATE_TASK:
         this.#featureModel.updateItem(updateType,  update);
         break;
-    // case UserAction.ADD_TASK:
-    //
-    //   break;
-    case UserAction.DELETE_TASK:
-      this.#commentModel.deleateItem(updateType,  update);
-      break;
+        // case UserAction.ADD_TASK:
+        //
+        //   break;
+      case UserAction.DELETE_TASK:
+        this.#commentModel.deleateItem(updateType,  update);
+        break;
     }
   };
 
   #handleModelEvent = (updateType, data) => {
     // console.log(updateType, data);
     switch (updateType) {
-    case UpdateType.PATCH:
-    // - обновить часть списка (например, когда поменялось описание)
-    break;
+      case UpdateType.PATCH:
+        // - обновить часть списка (например, когда поменялось описание)
+        break;
       case UpdateType.MINOR:
         // this.#clearFeatureList();
         this.#clearBoard({resetSortType: true});
@@ -209,14 +212,14 @@ export class BoardPresenter {
         // this.#filmPresenter.get(data.id).init(data);
         // - обновить список (например, когда задача ушла в архив)
         break;
-    // case UpdateType.MAJOR:
-    // - обновить всю доску (например, при переключении фильтра)
-    // break;
-    case UpdateType.INIT:
-      this.#isLoading = false;
-      remove(this.#loadingComponent);
-      this.#renderBoard();
-    break;
+        // case UpdateType.MAJOR:
+        // - обновить всю доску (например, при переключении фильтра)
+        // break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderBoard();
+        break;
     }
   };
 
