@@ -64,7 +64,7 @@ export default class FilmPresenter {
     this.#popupComponent.setComments(this.#popupComments);
     document.body.append(this.#popupComponent.element);
 
-    console.log(this.#popupComments);
+    // console.log(this.#popupComments);
 
     this.#popupComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
     this.#popupComponent.setWatchedClickHandler(this.#handleWatchedClick);
@@ -114,14 +114,15 @@ export default class FilmPresenter {
   };
 
   //Колбэк для удаления комментария
-  #handleDeleateCommentClick=(features)=> {
-    this.#changeData(UserAction.DELETE_TASK,
+  #handleDeleateCommentClick=(comment)=> {
+    this.#changeData(UserAction.DELETE_COMMENT,
       UpdateType.PATCH,
-      features.comments);
+      comment);
   };
 
   //Колбэк для добавления комментария
-  #handleAddComment=(features)=>{
+  #handleAddComment = (comment) => {
+    this.#changeData(UserAction.ADD_COMMENT, UpdateType.PATCH, comment);
   };
 
 }

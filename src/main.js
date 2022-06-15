@@ -16,8 +16,8 @@ const features = Array.from({length: 12}, generateFilmFeature);
 // const comments = features.map((film)=> generateFilmComments(film.id));
 const comments = features.flatMap((film)=>Array.from({length: 10},()=>generateFilmComments(film.id)));
 
-console.log(features);
-console.log(comments);
+// console.log(features);
+// console.log(comments);
 
 const boardPresenter=new BoardPresenter();
 const featureModel=new FeatureModel(features);

@@ -75,7 +75,8 @@ export const generateFilmFeature = () => {
   });};
 
 export const generateFilmComments = (filmId) => ({
-  id: filmId,
+  id: nanoid(),
+  idFilm: filmId,
   // eslint-disable-next-line quotes
   author: `Ilya O'Reilly`,
   comment: 'a film that changed my life, a true masterpiece, post-credit scene was just amazing omg.',

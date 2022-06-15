@@ -2,6 +2,7 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import {humanizeWholeDate,humanizeWholeDateWithTime} from '../utils.js';
 import { EMOTIONS } from '../const/const';
+import { nanoid } from 'nanoid';
 
 
 const createNewEmotionTemplate=(chosenEmotion)=>EMOTIONS.map((emotion)=>`
@@ -10,7 +11,7 @@ const createNewEmotionTemplate=(chosenEmotion)=>EMOTIONS.map((emotion)=>`
   <img src="./images/emoji/${emotion}.png" width="30" height="30" alt="emoji">
 </label>`).join('');
 
-const createNewCommentTemplate=(chosenEmotion)=> (`
+const createNewCommentTemplate=(chosenEmotion,newComment)=> (`
 <div class="film-details__new-comment">
 
 <div class="film-details__add-emoji-label">
@@ -18,7 +19,7 @@ ${(chosenEmotion!==null)? `<img src="./images/emoji/${chosenEmotion}.png" width=
 </div>
 
 <label class="film-details__comment-label">
-  <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+  <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${newComment}</textarea>
 </label>
 
 <div class="film-details__emoji-list">
@@ -27,7 +28,7 @@ ${(chosenEmotion!==null)? `<img src="./images/emoji/${chosenEmotion}.png" width=
 </div>`);
 
 const createAllCommentsTemplate=(comments)=>{
-  const {comment,author,date,emotion}=comments;
+  const {id,comment,author,date,emotion}=comments;
   const commentDate=humanizeWholeDateWithTime(date);
 
   return (`<li class="film-details__comment">
@@ -39,7 +40,7 @@ const createAllCommentsTemplate=(comments)=>{
     <p class="film-details__comment-info">
       <span class="film-details__comment-author">${author}</span>
       <span class="film-details__comment-day">${commentDate}</span>
-      <button class="film-details__comment-delete">Delete</button>
+      <button class="film-details__comment-delete" data-id="${id}">Delete</button>
     </p>
   </div>
 </li>
@@ -50,11 +51,11 @@ const createNewPopupTemplate = (feature) => {
   const {title,alternativeTitle,posters, description, runtime, genre,director,writers,actors} = feature.filmInfo;
   const {date}=feature.filmInfo.release;
   const {comments=[]}=feature;
-  const {chosenEmotion}=feature;
+  const {chosenEmotion,newComment}=feature;
   const filmDate=humanizeWholeDate(date);
   const {watchlist,alreadyWatched:watched,favorite}=feature.userDetails;
   const isUserDetailActive=(detail)=> detail ? 'film-details__control-button--active': '';
-  const newCommentTempalte=createNewCommentTemplate(chosenEmotion);
+  const newCommentTempalte=createNewCommentTemplate(chosenEmotion,newComment);
 
   return (`<section class="film-details">
 <form class="film-details__inner" action="" method="get">
@@ -162,7 +163,7 @@ export class NewPopupView extends AbstractStatefulView {
 
   static parseFeaturesToState = (feature) => ({...feature,
     chosenEmotion: null,
-    newComment:null
+    newComment:''
   });
 
   static parseStateToFeatures = (state) => {
@@ -183,6 +184,7 @@ export class NewPopupView extends AbstractStatefulView {
     this.setWatchlistClickHandler(this._callback.watchlistClick);
     this.setWatchedClickHandler(this._callback.watchedClick);
     this.setFavoriteClickHandler(this._callback.favoriteClick);
+    this.setFormSubmitHandler(this._callback.formSubmit);
   };
 
   #setInnerHandlers = () => {
@@ -190,10 +192,7 @@ export class NewPopupView extends AbstractStatefulView {
     for (let i=0; i<buttons.length; i++) {
       buttons[i].addEventListener('change',this.#emotionPickHandler);
     }
-    // const buttonDeleate=this.element.querySelectorAll('.film-details__comment-delete');
-    // for (let i=0; i<buttonDeleate.length; i++) {
-    //   buttonDeleate[i].addEventListener('click',()=>{buttonDeleate[i].parentElement.deleateComment();});
-    // }
+    this.element.querySelector('textarea').addEventListener('change',this.#newCommentInput);
   };
 
   #emotionPickHandler = (evt) => {
@@ -225,19 +224,19 @@ export class NewPopupView extends AbstractStatefulView {
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoriteClickHandler);
   };
 
+  //Обработчик удаления комментария
   setCommentDeleateClickHandler = (callback) => {
     this._callback.deleateCommentClick = callback;
     const buttonDeleate=this.element.querySelectorAll('.film-details__comment-delete');
     for (let i=0; i<buttonDeleate.length; i++) {
       buttonDeleate[i].addEventListener('click',this.#commentDeleateClickHandler);
     }
-    // this.element.querySelectorAll('.film-details__comment-delete').addEventListener('click', this.#commentDeleateClickHandler);
   };
 
   //Обработчик отправки формы
   setFormSubmitHandler = (callback) => {
     this._callback.formSubmit = callback;
-    this.element.querySelector('form').addEventListener('submit', this.#newCommentInput);
+    this.element.querySelector('textarea').addEventListener('keydown', this.#newCommentSubmit);
   };
 
   #watchlistClickHandler = (evt) => {
@@ -257,19 +256,34 @@ export class NewPopupView extends AbstractStatefulView {
 
   #commentDeleateClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.deleateCommentClick(NewPopupView.parseStateToFeatures(this._state));
+    this._callback.deleateCommentClick({idFilm:this._state.id, id:evt.currentTarget.dataset.id});
   };
-
-  // #formSubmitHandler = (evt) => {
-  //   evt.preventDefault();
-  //   this._callback.formSubmit(NewPopupView.parseStateToTask(this._state));
-  // };
 
   #newCommentInput = (evt) => {
     evt.preventDefault();
+    const oldScrollPosition=this.element.scrollTop;
     this.updateElement({
-      newComment: this.element.querySelector('.film-details__comment-input').value
+      newComment: evt.currentTarget.value
     });
+    this.element.scrollTop=oldScrollPosition;
+  };
+
+  #newCommentSubmit = (evt) => {
+    if(evt.key==='Enter' && evt.ctrlKey){
+      evt.preventDefault();
+      this._callback.formSubmit({
+        id:nanoid(),
+        idFilm:this._state.id,
+        author: 'Ilya O\'Reilly',
+        comment: this._state.newComment,
+        date: '2019-05-11T16:12:32.554Z',
+        emotion: this._state.chosenEmotion
+      });
+      this.updateElement({
+        chosenEmotion:'',
+        newComment: ''
+      });
+    }
   };
 
   #clickClosePopupHandler = (evt) => {
