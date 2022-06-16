@@ -24,9 +24,9 @@ const UpdateType = {
   INIT: 'INIT',
 };
 
-const AUTHORIZATION = 'Basic jGrid45';
-const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict/';
+// const AUTHORIZATION = 'Basic jGrid45';
+// const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict/';
 
 const EMOTIONS = ['smile', 'sleeping', 'puke', 'angry'];
 
-export {FilterType,SortType, UserAction,UpdateType,AUTHORIZATION,END_POINT, EMOTIONS};
+export {FilterType,SortType, UserAction,UpdateType, EMOTIONS};

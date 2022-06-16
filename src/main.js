@@ -8,19 +8,18 @@ import {FeatureModel} from './model/feature-model.js';
 import {CommentModel} from './model/comment-model';
 import FilterPresenter from './presenter/filter-presenter.js';
 import FilterModel from './model/filter-model.js';
-import FeaturesApiService from './tasks-api-service.js';
+import FeaturesApiService from './features-api-service.js';
 import { NewPopupView } from './view/new-popup-view.js';
-import { AUTHORIZATION } from './const/const.js';
-import { END_POINT } from './const/const.js';
+// import { AUTHORIZATION } from './const/const.js';
+// import { END_POINT } from './const/const.js';
 
-// const AUTHORIZATION = 'Basic jGrid45';
-// const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict/';
+const AUTHORIZATION = 'Basic jGrid45';
+const END_POINT = 'https://17.ecmascript.pages.academy/cinemaddict/';
 
 const siteHeaderElement=document.querySelector('.header');
 const siteMainElement=document.querySelector('.main');
 
 // const features = Array.from({length: 12}, generateFilmFeature);
-// const comments = features.map((film)=> generateFilmComments(film.id));
 // const comments = features.flatMap((film)=>Array.from({length: 10},()=>generateFilmComments(film.id)));
 
 // console.log(features);

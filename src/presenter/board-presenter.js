@@ -44,7 +44,7 @@ export class BoardPresenter {
 
     this.#featureModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
-    // this.#commentModel.addObserver(this.#handleModelEvent);
+    // this.#commentModel.addObserver(this.#renderFeature);
 
     this.#renderBoard();
   };
@@ -71,7 +71,6 @@ export class BoardPresenter {
     }
     this.#currentSortType = sortType;
     // - Очищаем список
-    // this.#clearFeatureList();
     this.#clearBoard();
     // - Рендерим список заново
     this.#renderBoard();
@@ -83,16 +82,16 @@ export class BoardPresenter {
     render(this.#sortComponent, siteMainElement);
   };
 
-  #renderFeatureList = () => {
-    const featureCount=this.features.length;
-    const features=this.features.slice(0, Math.min(featureCount, TASK_COUNT_PER_STEP));
+  // #renderFeatureList = () => {
+  //   const featureCount=this.features.length;
+  //   const features=this.features.slice(0, Math.min(featureCount, TASK_COUNT_PER_STEP));
 
-    this.#renderFeatures(features);
+  //   this.#renderFeatures(features);
 
-    if (featureCount > TASK_COUNT_PER_STEP) {
-      this.#renderLoadMoreButton();
-    }
-  };
+  //   if (featureCount > TASK_COUNT_PER_STEP) {
+  //     this.#renderLoadMoreButton();
+  //   }
+  // };
 
   #renderFeatures = (features) => {
     features.forEach((feature)=>this.#renderFeature(feature));
@@ -100,15 +99,7 @@ export class BoardPresenter {
 
 
   #renderFeature(task) {
-    // const comments = this.#commentModel.getCommentForFeature(feature.id);
-    // const comments = this.#commentModel.init();
-    this.#commentModel.init();
-    console.log(this.#commentModel.comments);
-    // const filmPresenter = new FilmPresenter(this.filmsListContainer.element,this.#handleViewAction,this.#handleOpenPopup);
-
-    // filmPresenter.init(task,comments);
-    // this.#filmPresenter.set(task.id,filmPresenter);
-    const comments = this.#commentModel.getCommentForFeature(task.id);
+    const comments = this.#commentModel.getCommentForCurrentFilm(task);
     const filmPresenter =this.#filmPresenter.has(task.id)?this.#filmPresenter.get(task.id): new FilmPresenter(this.filmsListContainer.element,this.#handleViewAction,this.#handleOpenPopup);
     filmPresenter.init(task,comments);
     this.#filmPresenter.set(task.id,filmPresenter);
@@ -207,7 +198,6 @@ export class BoardPresenter {
         }
         break;
       case UpdateType.MINOR:
-        // this.#clearFeatureList();
         this.#clearBoard({resetSortType: true});
         this.#renderBoard();
         break;

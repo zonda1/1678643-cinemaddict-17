@@ -17,14 +17,16 @@ export class CommentModel extends Observable {
   init=async()=>{
     try {
       this.#comments  = await this.#featuresApiService.comments;
-      // this.#comments = comments.map(this.#adaptToClient);
+      console.log(this.#comments);
     } catch(err) {
       this.#comments = [];
     }
-    // this._notify(UpdateType.INIT);
+    // this._notify();
   };
 
   get comments() {return this.#comments;}
+
+  getCommentForCurrentFilm=(feature)=>this.#featuresApiService.getFilmId(feature);
 
   getCommentForFeature(id) {return this.#comments.filter((comment)=>comment.idFilm===id);}
 
