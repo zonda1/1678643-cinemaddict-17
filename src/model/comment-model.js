@@ -2,7 +2,7 @@ import Observable from '../framework/observable';
 import { UpdateType } from '../const/const';
 
 export class CommentModel extends Observable {
-  #comments=[];
+  #comments=null;
   #featuresApiService=null;
 
   constructor (featuresApiService) {
@@ -21,7 +21,7 @@ export class CommentModel extends Observable {
     } catch(err) {
       this.#comments = [];
     }
-    // this._notify();
+    // this._notify(UpdateType.INIT_COMMENT);
   };
 
   get comments() {return this.#comments;}

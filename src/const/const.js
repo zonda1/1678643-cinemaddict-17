@@ -22,6 +22,7 @@ const UpdateType = {
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
   INIT: 'INIT',
+  INIT_COMMENT: 'INIT_COMMENT',
 };
 
 // const AUTHORIZATION = 'Basic jGrid45';

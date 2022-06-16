@@ -9,7 +9,7 @@ import {CommentModel} from './model/comment-model';
 import FilterPresenter from './presenter/filter-presenter.js';
 import FilterModel from './model/filter-model.js';
 import FeaturesApiService from './features-api-service.js';
-import { NewPopupView } from './view/new-popup-view.js';
+// import { NewPopupView } from './view/new-popup-view.js';
 // import { AUTHORIZATION } from './const/const.js';
 // import { END_POINT } from './const/const.js';
 

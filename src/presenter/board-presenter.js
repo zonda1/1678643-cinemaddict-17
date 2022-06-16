@@ -99,9 +99,8 @@ export class BoardPresenter {
 
 
   #renderFeature(task) {
-    const comments = this.#commentModel.getCommentForCurrentFilm(task);
-    const filmPresenter =this.#filmPresenter.has(task.id)?this.#filmPresenter.get(task.id): new FilmPresenter(this.filmsListContainer.element,this.#handleViewAction,this.#handleOpenPopup);
-    filmPresenter.init(task,comments);
+    const filmPresenter =this.#filmPresenter.has(task.id)?this.#filmPresenter.get(task.id): new FilmPresenter(this.filmsListContainer.element,this.#commentModel,this.#handleViewAction,this.#handleOpenPopup);
+    filmPresenter.init(task);
     this.#filmPresenter.set(task.id,filmPresenter);
     // console.log(comments);
   }

@@ -10,21 +10,25 @@ export default class FilmPresenter {
 
   #task = null;
   #filmsListContainer=null;
+  #commentModel=null;
   #featureComponent=null;
   #popupComponent=null;
   #popupComments=null;
   #changeData = null;
   #handleOpenPopup=null;
 
-  constructor(filmsListContainer,changeData,handleOpenPopup) {
+  constructor(filmsListContainer,commentModel,changeData,handleOpenPopup) {
     this.#filmsListContainer = filmsListContainer;
+    this.#commentModel=commentModel;
     this.#changeData=changeData;
     this.#handleOpenPopup=handleOpenPopup;
+
+    // this.#commentModel.addObserver(this.#renderPopup);
   }
 
-  init = (task,popupComments) => {
+  init = (task) => {
     this.#task = task;
-    this.#popupComments=popupComments;
+    // this.#popupComments=popupComments;
     const prevFeatureComponent=this.#featureComponent;
     this.#featureComponent= new NewFilmCardView(task);
     this.#featureComponent.setClickPopupOpener(()=>{
@@ -64,6 +68,8 @@ export default class FilmPresenter {
   #renderPopup() {
     this.#handleOpenPopup();
     this.#popupComponent=new NewPopupView(this.#task);
+
+    // this.#popupComments=this.#commentModel.getCommentForCurrentFilm(this.#task);
     this.#popupComponent.setComments(this.#popupComments);
     document.body.append(this.#popupComponent.element);
 
