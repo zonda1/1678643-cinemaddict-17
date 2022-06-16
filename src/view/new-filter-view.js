@@ -1,5 +1,4 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { makeUpperCaseFirst } from '../utils.js';
 import { FilterType } from '../const/const.js';
 
 const createNewFilterItemTemplate = (filter,currentFilterType) => {

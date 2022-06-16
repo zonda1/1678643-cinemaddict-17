@@ -74,12 +74,13 @@
 //     }
 //   });};
 
-// export const generateFilmComments = (filmId) => ({
-//   id: filmId,
-//   // eslint-disable-next-line quotes
-//   author: `Ilya O'Reilly`,
-//   comment: 'a film that changed my life, a true masterpiece, post-credit scene was just amazing omg.',
-//   date: '2019-05-11T16:12:32.554Z',
-//   emotion: getRandomEmotion()
-// });
+export const generateFilmComments = (filmId) => ({
+  id: nanoid(),
+  idFilm: filmId,
+  // eslint-disable-next-line quotes
+  author: `Ilya O'Reilly`,
+  comment: 'a film that changed my life, a true masterpiece, post-credit scene was just amazing omg.',
+  date: '2019-05-11T16:12:32.554Z',
+  emotion: getRandomEmotion()
+});
 

@@ -1,4 +1,5 @@
-// import {NewFilterView} from '../view/new-filter-view.js';
+/* eslint-disable no-case-declarations */
+/* eslint-disable no-console */
 import {NewSortView} from '../view/new-sort-view.js';
 import {NewFilmsSectionView} from '../view/new-films-section-view';
 import {NewFilmsListSectionView} from '../view/new-films-list-section-view';
@@ -55,14 +56,11 @@ export class BoardPresenter {
 
     switch (this.#currentSortType) {
       case SortType.DATE:
-        // return this.#featureModel.features.sort(sortDateDown);
         return filteredTasks.sort(sortDateDown);
 
       case SortType.RATING:
-        // return this.#featureModel.features.sort(sortRatingDown);
         return filteredTasks.sort(sortRatingDown);
     }
-    // return this.#featureModel.features;
     return filteredTasks;
   }
 
@@ -101,21 +99,20 @@ export class BoardPresenter {
   };
 
 
-  #renderFeature(feature) {
+  #renderFeature(task) {
     // const comments = this.#commentModel.getCommentForFeature(feature.id);
     // const comments = this.#commentModel.init();
     this.#commentModel.init();
     console.log(this.#commentModel.comments);
     // const filmPresenter = new FilmPresenter(this.filmsListContainer.element,this.#handleViewAction,this.#handleOpenPopup);
 
-
-    // filmPresenter.init(feature,comments);
-    // this.#filmPresenter.set(feature.id,filmPresenter);
-    // const comments = this.#commentModel.getCommentForFeature(feature.id);
-    const filmPresenter =this.#filmPresenter.has(feature.id)?this.#filmPresenter.get(feature.id): new FilmPresenter(this.filmsListContainer.element,this.#handleViewAction,this.#handleOpenPopup);
-    filmPresenter.init(feature,comments);
-    // filmPresenter.init(feature);
-    this.#filmPresenter.set(feature.id,filmPresenter);
+    // filmPresenter.init(task,comments);
+    // this.#filmPresenter.set(task.id,filmPresenter);
+    const comments = this.#commentModel.getCommentForFeature(task.id);
+    const filmPresenter =this.#filmPresenter.has(task.id)?this.#filmPresenter.get(task.id): new FilmPresenter(this.filmsListContainer.element,this.#handleViewAction,this.#handleOpenPopup);
+    filmPresenter.init(task,comments);
+    this.#filmPresenter.set(task.id,filmPresenter);
+    // console.log(comments);
   }
 
   #clearFeatureList = ({resetRenderedTaskCount = false} = {}) => {
@@ -190,10 +187,10 @@ export class BoardPresenter {
       case UserAction.UPDATE_TASK:
         this.#featureModel.updateItem(updateType,  update);
         break;
-        // case UserAction.ADD_TASK:
-        //
-        //   break;
-      case UserAction.DELETE_TASK:
+      case UserAction.ADD_COMMENT:
+        this.#commentModel.addItem(updateType, update);
+        break;
+      case UserAction.DELETE_COMMENT:
         this.#commentModel.deleateItem(updateType,  update);
         break;
     }
@@ -204,13 +201,15 @@ export class BoardPresenter {
     switch (updateType) {
       case UpdateType.PATCH:
         // - обновить часть списка (например, когда поменялось описание)
+        const presenter=this.#filmPresenter.get(data.id);
+        if (presenter) {
+          presenter.init(this.#featureModel.features.find((item)=>item.id===data.id), this.#commentModel.getCommentForFeature(data.id));
+        }
         break;
       case UpdateType.MINOR:
         // this.#clearFeatureList();
         this.#clearBoard({resetSortType: true});
         this.#renderBoard();
-        // this.#filmPresenter.get(data.id).init(data);
-        // - обновить список (например, когда задача ушла в архив)
         break;
         // case UpdateType.MAJOR:
         // - обновить всю доску (например, при переключении фильтра)

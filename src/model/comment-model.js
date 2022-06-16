@@ -26,7 +26,7 @@ export class CommentModel extends Observable {
 
   get comments() {return this.#comments;}
 
-  getCommentForFeature(id) {return this.#comments.filter((comment)=>comment.id===id);}
+  getCommentForFeature(id) {return this.#comments.filter((comment)=>comment.idFilm===id);}
 
   deleateItem = (updateType, update) => {
     const index = this.#comments.findIndex((comment) => comment.id === update.id);
@@ -40,7 +40,7 @@ export class CommentModel extends Observable {
       ...this.#comments.slice(index + 1),
     ];
 
-    this._notify(updateType);
+    this._notify(updateType,{id:update.idFilm});
   };
 
   addItem = (updateType, update) => {
@@ -49,6 +49,6 @@ export class CommentModel extends Observable {
       ...this.#comments,
     ];
 
-    this._notify(updateType, update);
+    this._notify(updateType, {id:update.idFilm});
   };
 }
