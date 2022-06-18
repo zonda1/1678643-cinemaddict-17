@@ -3,15 +3,15 @@ import { FilterType } from '../const/const.js';
 
 const createNewFilterItemTemplate = (filter,currentFilterType) => {
   const {type,name,count}=filter;
-  if (name ==='All') {
+  if (name ==='All movies') {
     return (`
     <a href="#${name}"
-    ${type === currentFilterType ? 'checked' : ''} class="main-navigation__item" data-filter-type=${FilterType.ALL}>${name}
+    class="main-navigation__item ${type === currentFilterType ? 'main-navigation__item--active' : ''}" data-filter-type=${FilterType.ALL}>${name}
     </a>
   `);}
   return (`
   <a href="#${name}"
-  ${type === currentFilterType ? 'checked' : ''}class="main-navigation__item" data-filter-type=${type}>${name} <span class="main-navigation__item-count">${count}</span></a>
+  class="main-navigation__item ${type === currentFilterType ? 'main-navigation__item--active' : ''}" data-filter-type=${type}>${name} <span class="main-navigation__item-count">${count}</span></a>
 `);
 };
 

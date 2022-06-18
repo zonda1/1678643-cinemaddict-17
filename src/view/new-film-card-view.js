@@ -1,12 +1,12 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {humanizeOnlyYear} from '../utils.js';
+import {humanizeOnlyYear,convertIntoHours} from '../utils.js';
 
 const createNewFilmCardTemplate = (feature) => {
   const {title,poster, description,totalRating,runtime, genre} = feature.filmInfo;
   const {date}=feature.filmInfo.release;
+  const {comments=[]}=feature;
   const filmDate=humanizeOnlyYear(date);
   const {watchlist,alreadyWatched:watched,favorite}=feature.userDetails;
-
   const isUserDetailActive=(detail)=> detail ? 'film-card__controls-item--active': '';
 
   return (`
@@ -16,12 +16,12 @@ const createNewFilmCardTemplate = (feature) => {
   <p class="film-card__rating">${totalRating}</p>
   <p class="film-card__info">
     <span class="film-card__year">${filmDate}</span>
-    <span class="film-card__duration">${runtime}m</span>
-    <span class="film-card__genre">${genre}</span>
+    <span class="film-card__duration">${convertIntoHours(runtime)}</span>
+    <span class="film-card__genre">${genre[0]}</span>
   </p>
   <img src=${poster} alt="" class="film-card__poster">
   <p class="film-card__description">${description}</p>
-  <span class="film-card__comments">5 comments</span>
+  <span class="film-card__comments">${comments.length} comments</span>
 </a>
 <div class="film-card__controls">
   <button class="film-card__controls-item film-card__controls-item--add-to-watchlist ${isUserDetailActive(watchlist)}" type="button">Add to watchlist</button>

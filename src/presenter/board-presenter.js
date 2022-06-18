@@ -35,12 +35,15 @@ export class BoardPresenter {
 
   #renderedFeatureCount = TASK_COUNT_PER_STEP;
 
-  init = (boardContainer,featureModel,commentModel,filterModel) => {
-
-    this.#boardContainer = boardContainer;
+  constructor(featureModel,commentModel,filterModel) {
     this.#featureModel = featureModel;
     this.#filterModel=filterModel;
     this.#commentModel = commentModel;
+  }
+
+  init = (boardContainer) => {
+
+    this.#boardContainer = boardContainer;
 
     this.#featureModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);

@@ -69,12 +69,10 @@ export default class FilmPresenter {
     this.#handleOpenPopup();
     this.#popupComponent=new NewPopupView(this.#task);
 
-    // this.#popupComments=this.#commentModel.getCommentForCurrentFilm(this.#task);
-    this.#popupComponent.setComments(this.#popupComments);
     document.body.append(this.#popupComponent.element);
 
     // console.log(this.#popupComments);
-
+    this.#commentModel.getCommentsForFilm(this.#task).then((comments)=>this.#popupComponent.setComments(comments));
     this.#popupComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
     this.#popupComponent.setWatchedClickHandler(this.#handleWatchedClick);
     this.#popupComponent.setFavoriteClickHandler(this.#handleFavoriteClick);

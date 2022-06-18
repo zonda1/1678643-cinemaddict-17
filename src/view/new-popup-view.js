@@ -1,16 +1,17 @@
 /* eslint-disable quotes */
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
-import {humanizeWholeDate,humanizeWholeDateWithTime} from '../utils.js';
+import {humanizeWholeDate,humanizeWholeDateWithTime,convertIntoHours} from '../utils.js';
 import { EMOTIONS } from '../const/const';
 import { nanoid } from 'nanoid';
 
-
+//Шаблон для рендеринга эмодзи в виде списка радиокнопок
 const createNewEmotionTemplate=(chosenEmotion)=>EMOTIONS.map((emotion)=>`
 <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-${emotion}" value="${emotion}" ${(emotion===chosenEmotion)?'checked':''}>
 <label class="film-details__emoji-label" for="emoji-${emotion}">
   <img src="./images/emoji/${emotion}.png" width="30" height="30" alt="emoji">
 </label>`).join('');
 
+//Шаблон для рендеринга блока для ввода нового комента
 const createNewCommentTemplate=(chosenEmotion,newComment)=> (`
 <div class="film-details__new-comment">
 
@@ -27,6 +28,8 @@ ${(chosenEmotion!==null)? `<img src="./images/emoji/${chosenEmotion}.png" width=
 </div>
 </div>`);
 
+
+//Шаблон для рендеринга списка загружаемых коментов
 const createAllCommentsTemplate=(comments)=>{
   const {id,comment,author,date,emotion}=comments;
   const commentDate=humanizeWholeDateWithTime(date);
@@ -101,7 +104,7 @@ const createNewPopupTemplate = (feature) => {
           </tr>
           <tr class="film-details__row">
             <td class="film-details__term">Runtime</td>
-            <td class="film-details__cell">${runtime}m</td>
+            <td class="film-details__cell">${convertIntoHours(runtime)}m</td>
           </tr>
           <tr class="film-details__row">
             <td class="film-details__term">Country</td>
@@ -185,6 +188,7 @@ export class NewPopupView extends AbstractStatefulView {
     this.setWatchedClickHandler(this._callback.watchedClick);
     this.setFavoriteClickHandler(this._callback.favoriteClick);
     this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setCommentDeleateClickHandler(this._callback.deleateCommentClick);
   };
 
   #setInnerHandlers = () => {

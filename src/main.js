@@ -25,16 +25,18 @@ const siteMainElement=document.querySelector('.main');
 // console.log(features);
 // console.log(comments);
 
-const boardPresenter=new BoardPresenter();
-const featureModel=new FeatureModel(new FeaturesApiService(END_POINT, AUTHORIZATION));
-const commentModel=new CommentModel(new FeaturesApiService(END_POINT, AUTHORIZATION));
+
+const apiService=new FeaturesApiService(END_POINT, AUTHORIZATION);
+const featureModel=new FeatureModel(apiService);
+const commentModel=new CommentModel(apiService);
 const filterModel=new FilterModel();
+const boardPresenter=new BoardPresenter(featureModel,commentModel,filterModel);
 
 // const popupComponent=new NewPopupView(new FeaturesApiService(END_POINT, AUTHORIZATION));
 
 const filterPresenter=new FilterPresenter(siteMainElement,filterModel,featureModel);
 render(new NewUserLogoView(), siteHeaderElement);
 filterPresenter.init();
-boardPresenter.init(siteMainElement,featureModel,commentModel,filterModel);
+boardPresenter.init(siteMainElement);
 featureModel.init();
-commentModel.init();
+// commentModel.init();

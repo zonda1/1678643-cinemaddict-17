@@ -8,26 +8,19 @@ export class CommentModel extends Observable {
   constructor (featuresApiService) {
     super();
     this.#featuresApiService=featuresApiService;
-
     // this.#featuresApiService.comments.then((comments) => {
     //   console.log(comments);
     // });
   }
 
-  init=async()=>{
-    try {
-      this.#comments  = await this.#featuresApiService.comments;
-      console.log(this.#comments);
-    } catch(err) {
-      this.#comments = [];
-    }
-    // this._notify(UpdateType.INIT_COMMENT);
-  };
-
   get comments() {return this.#comments;}
 
-  getCommentForCurrentFilm=(feature)=>this.#featuresApiService.getFilmId(feature);
+  getCommentsForFilm(film) {
+    return this.#featuresApiService.getCommentsForFilm(film);
+  }
 
+
+  getCommentForCurrentFilm=(feature)=>this.#featuresApiService.getFilmId(feature);
   getCommentForFeature(id) {return this.#comments.filter((comment)=>comment.idFilm===id);}
 
   deleateItem = (updateType, update) => {
