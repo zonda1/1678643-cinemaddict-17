@@ -57,7 +57,6 @@ export class BoardPresenter {
     this.#filterType = this.#filterModel.filter;
     const features = this.#featureModel.features;
     const filteredTasks = filter[this.#filterType](features);
-
     switch (this.#currentSortType) {
       case SortType.DATE:
         return filteredTasks.sort(sortDateDown);

@@ -51,19 +51,25 @@ export class FeatureModel extends Observable {
     this.#features=features;
   }
 
-  updateItem = (updateType, update) => {
+  updateItem = async (updateType, update) => {
     const index = this.#features.findIndex((item) => item.id === update.id);
 
     if (index === -1) {
       return this.#features;
     }
-
-    this.#features= [
-      ...this.#features.slice(0, index),
-      update,
-      ...this.#features.slice(index + 1),
-    ];
-    this._notify(updateType, update);
+    try {
+      const response = await this.#featuresApiService.updateFeature(update);
+      const updatedFeature = this.#adaptToClient(response);
+      this.#features= [
+        ...this.#features.slice(0, index),
+        updatedFeature,
+        ...this.#features.slice(index + 1),
+      ];
+      this._notify(updateType, updatedFeature);
+    }
+    catch(err) {
+      throw new Error('Can\'t update feature');
+    }
   };
 
 }

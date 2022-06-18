@@ -1,6 +1,4 @@
 import {render} from './framework/render.js';
-import {generateFilmFeature} from './mock/feature.js';
-import {generateFilmComments} from './mock/feature.js';
 // import {generateFilter} from './mock/filter.js';
 import {NewUserLogoView} from './view/new-user-logo-view.js';
 import {BoardPresenter} from './presenter/board-presenter.js';

@@ -40,13 +40,13 @@ export default class FeaturesApiService extends ApiService {
         'already_watched':feature.userDetails.alreadyWatched,
         'watching_date':feature.userDetails.watchingDate},
     };
-    delete adaptedFeature.filmInfo;
     delete adaptedFeature.filmInfo.alternativeTitle;
     delete adaptedFeature.filmInfo.totalRating;
     delete adaptedFeature.filmInfo.ageRating;
-    delete adaptedFeature.userDetails;
+    delete adaptedFeature.filmInfo;
     delete adaptedFeature.userDetails.alreadyWatched;
     delete adaptedFeature.userDetails.watchingDate;
+    delete adaptedFeature.userDetails;
 
     return adaptedFeature;
   };
