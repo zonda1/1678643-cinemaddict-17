@@ -9,7 +9,7 @@ import {render,remove} from '../framework/render.js';
 import {NoFeatureView} from '../view/no-feature-view';
 import FilmPresenter from './film-presenter';
 import {sortDateDown,sortRatingDown} from '../utils.js';
-import { SortType,UserAction,UpdateType} from '../const/const.js';
+import { SortType,UserAction,UpdateType,FilterType} from '../const/const.js';
 import {filter}  from '../mock/filter';
 import LoadingView from '../view/loading-view.js';
 
@@ -26,10 +26,11 @@ export class BoardPresenter {
   filmsListContainer = new NewFilmsListContainerView();
   #loadMoreButtonComponent = new NewButtonView();
   #loadingComponent = new LoadingView();
-  #noFeatureComponent=new NoFeatureView();
   #currentSortType=SortType.DEFAULT;
   #sortComponent=null;
   #filterModel=null;
+  #filterType=FilterType.ALL;
+  #noFeatureComponent=null;
   #filmPresenter=new Map();
   #isLoading = true;
 
@@ -53,9 +54,9 @@ export class BoardPresenter {
   };
 
   get features() {
-    const filterType = this.#filterModel.filter;
+    this.#filterType = this.#filterModel.filter;
     const features = this.#featureModel.features;
-    const filteredTasks = filter[filterType](features);
+    const filteredTasks = filter[this.#filterType](features);
 
     switch (this.#currentSortType) {
       case SortType.DATE:
@@ -115,6 +116,11 @@ export class BoardPresenter {
       this.#renderedFeatureCount = TASK_COUNT_PER_STEP;
     }
     remove(this.#loadMoreButtonComponent);
+
+    if (this.#noFeatureComponent) {
+      remove(this.#noFeatureComponent);
+    }
+
   };
 
   #clearBoard=({resetSortType = false} = {})=> {
@@ -126,6 +132,7 @@ export class BoardPresenter {
   };
 
   #renderNoFeature() {
+    this.#noFeatureComponent=new NoFeatureView(this.#filterType);
     render(this.#noFeatureComponent,this.filmsListSection.element);
   }
 
