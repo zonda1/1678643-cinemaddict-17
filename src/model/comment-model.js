@@ -1,5 +1,4 @@
 import Observable from '../framework/observable';
-import { UpdateType } from '../const/const';
 
 export class CommentModel extends Observable {
   #comments=null;

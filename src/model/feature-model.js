@@ -13,7 +13,7 @@ export class FeatureModel extends Observable {
     try {
       const features = await this.#featuresApiService.features;
       this.#features = features.map(this.#adaptToClient);
-      console.log(this.#features);
+      // console.log(this.#features);
     } catch(err) {
       this.#features = [];
     }
