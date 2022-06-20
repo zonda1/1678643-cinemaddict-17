@@ -2,7 +2,6 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import {humanizeWholeDate,humanizeWholeDateWithTime,convertIntoHours} from '../utils.js';
 import { EMOTIONS } from '../const/const';
-import { nanoid } from 'nanoid';
 
 //Шаблон для рендеринга эмодзи в виде списка радиокнопок
 const createNewEmotionTemplate=(chosenEmotion)=>EMOTIONS.map((emotion)=>`
@@ -16,7 +15,7 @@ const createNewCommentTemplate=(chosenEmotion,newComment)=> (`
 <div class="film-details__new-comment">
 
 <div class="film-details__add-emoji-label">
-${(chosenEmotion!==null)? `<img src="./images/emoji/${chosenEmotion}.png" width="30" height="30" alt="emoji">`:''}
+${(chosenEmotion!==undefined && chosenEmotion!==null )? `<img src="./images/emoji/${chosenEmotion}.png" width="30" height="30" alt="emoji">`:''}
 </div>
 
 <label class="film-details__comment-label">
@@ -260,7 +259,8 @@ export class NewPopupView extends AbstractStatefulView {
 
   #commentDeleateClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.deleateCommentClick({idFilm:this._state.id, id:evt.currentTarget.dataset.id});
+    // this._callback.deleateCommentClick(this._state);
+    this._callback.deleateCommentClick({...this._state, idComment:evt.currentTarget.dataset.id});
   };
 
   #newCommentInput = (evt) => {
@@ -276,11 +276,8 @@ export class NewPopupView extends AbstractStatefulView {
     if(evt.key==='Enter' && evt.ctrlKey){
       evt.preventDefault();
       this._callback.formSubmit({
-        id:nanoid(),
         idFilm:this._state.id,
-        author: 'Ilya O\'Reilly',
         comment: this._state.newComment,
-        date: '2019-05-11T16:12:32.554Z',
         emotion: this._state.chosenEmotion
       });
       this.updateElement({

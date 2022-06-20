@@ -14,35 +14,56 @@ export class CommentModel extends Observable {
 
   get comments() {return this.#comments;}
 
+  #map=new Map();
+
   getCommentsForFilm(film) {
     return this.#featuresApiService.getCommentsForFilm(film);
   }
 
+//   getCommentsForCurrentFilm(update) {
+//     if (this.#map.has(update.idFilm)) {
+//       return this.#map.get(update.idFilm);
+//     }
+//     this.#featuresApiService.getCommentsForFilm(update).then(()=>{
+//       this.#map.set(update.idFilm,update.comments);
+//       this._notify(updateType,{id:update.id});
+//     });
+//     return [];
+//   }
 
-  getCommentForCurrentFilm=(feature)=>this.#featuresApiService.getFilmId(feature);
-  getCommentForFeature(id) {return this.#comments.filter((comment)=>comment.idFilm===id);}
+  deleateComment = async (updateType, update) => {
+    // this.#comments=update.comments;
+    // const index = this.#comments.findIndex((comment) => comment.id === update.id);
 
-  deleateItem = (updateType, update) => {
-    const index = this.#comments.findIndex((comment) => comment.id === update.id);
+    // if (index === -1) {
+    //   throw new Error('Can\'t delete unexisting comment');
+    // }
 
-    if (index === -1) {
-      throw new Error('Can\'t delete unexisting task');
+    try {
+      await this.#featuresApiService.deleteComment(update);
+      // this.#comments = [
+      //   ...this.#comments.slice(0, index),
+      //   ...this.#comments.slice(index + 1),
+      // ];
+      this._notify(updateType,update);
+      // this._notify(updateType,{id:update.id});
     }
-
-    this.#comments = [
-      ...this.#comments.slice(0, index),
-      ...this.#comments.slice(index + 1),
-    ];
-
-    this._notify(updateType,{id:update.idFilm});
+    catch(err) {
+      throw new Error('Can\'t delete comment');
+    }
   };
 
-  addItem = (updateType, update) => {
-    this.#comments = [
-      update,
-      ...this.#comments,
-    ];
 
-    this._notify(updateType, {id:update.idFilm});
+  addComment = async (updateType, update) => {
+    try {
+      await this.#featuresApiService.addComment(update);
+      // this.#comments = [
+      //   response,
+      //   ...this.#comments,
+      // ];
+      this._notify(updateType, {id:update.idFilm});
+    } catch(err) {
+      throw new Error('Can\'t add new comment');
+    }
   };
 }

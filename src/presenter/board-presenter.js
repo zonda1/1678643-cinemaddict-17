@@ -48,7 +48,7 @@ export class BoardPresenter {
 
     this.#featureModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
-    // this.#commentModel.addObserver(this.#renderFeature);
+    this.#commentModel.addObserver(this.#handleModelEvent);
 
     this.#renderBoard();
   };
@@ -187,10 +187,10 @@ export class BoardPresenter {
         this.#featureModel.updateItem(updateType,  update);
         break;
       case UserAction.ADD_COMMENT:
-        this.#commentModel.addItem(updateType, update);
+        this.#commentModel.addComment(updateType, update);
         break;
       case UserAction.DELETE_COMMENT:
-        this.#commentModel.deleateItem(updateType,  update);
+        this.#commentModel.deleateComment(updateType,  update);
         break;
     }
   };
@@ -202,16 +202,14 @@ export class BoardPresenter {
         // - обновить часть списка (например, когда поменялось описание)
         const presenter=this.#filmPresenter.get(data.id);
         if (presenter) {
-          presenter.init(this.#featureModel.features.find((item)=>item.id===data.id), this.#commentModel.getCommentForFeature(data.id));
+          // presenter.init(this.#featureModel.features.find((item)=>item.id===data.id), this.#commentModel.getCommentsForFilm(data));
+          presenter.init(this.#featureModel.features.find((item)=>item.id===data.id));
         }
         break;
       case UpdateType.MINOR:
         this.#clearBoard({resetSortType: true});
         this.#renderBoard();
         break;
-        // case UpdateType.MAJOR:
-        // - обновить всю доску (например, при переключении фильтра)
-        // break;
       case UpdateType.INIT:
         this.#isLoading = false;
         remove(this.#loadingComponent);
