@@ -11,7 +11,7 @@ const createNewEmotionTemplate=(chosenEmotion)=>EMOTIONS.map((emotion)=>`
 </label>`).join('');
 
 //Шаблон для рендеринга блока для ввода нового комента
-const createNewCommentTemplate=(chosenEmotion,newComment)=> (`
+const createNewCommentTemplate=(chosenEmotion,newComment,isDisabled)=> (`
 <div class="film-details__new-comment">
 
 <div class="film-details__add-emoji-label">
@@ -19,7 +19,7 @@ ${(chosenEmotion!==undefined && chosenEmotion!==null )? `<img src="./images/emoj
 </div>
 
 <label class="film-details__comment-label">
-  <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${newComment}</textarea>
+  <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" ${isDisabled?'disabled':''} >${newComment}</textarea>
 </label>
 
 <div class="film-details__emoji-list">
@@ -29,7 +29,7 @@ ${(chosenEmotion!==undefined && chosenEmotion!==null )? `<img src="./images/emoj
 
 
 //Шаблон для рендеринга списка загружаемых коментов
-const createAllCommentsTemplate=(comments)=>{
+const createAllCommentsTemplate=(comments,isDeleating,isDisabled)=>{
   const {id,comment,author,date,emotion}=comments;
   const commentDate=humanizeWholeDateWithTime(date);
 
@@ -42,7 +42,7 @@ const createAllCommentsTemplate=(comments)=>{
     <p class="film-details__comment-info">
       <span class="film-details__comment-author">${author}</span>
       <span class="film-details__comment-day">${commentDate}</span>
-      <button class="film-details__comment-delete" data-id="${id}">Delete</button>
+      <button class="film-details__comment-delete" data-id="${id}" ${isDisabled ? 'disabled' : ''}>${ isDeleating ? 'Deleting...' : 'Delete'}</button>
     </p>
   </div>
 </li>
@@ -53,12 +53,15 @@ const createNewPopupTemplate = (feature) => {
   const {title,alternativeTitle,poster, description, runtime, genre,director,writers,actors,totalRating,ageRating} = feature.filmInfo;
   const {date}=feature.filmInfo.release;
   const {comments=[]}=feature;
-  const {chosenEmotion,newComment}=feature;
+  const {chosenEmotion,newComment,isDisabled,isDeleating}=feature;
   const filmDate=humanizeWholeDate(date);
   const {watchlist,alreadyWatched:watched,favorite}=feature.userDetails;
   const isUserDetailActive=(detail)=> detail ? 'film-details__control-button--active': '';
-  const newCommentTempalte=createNewCommentTemplate(chosenEmotion,newComment);
+  const newCommentTempalte=createNewCommentTemplate(chosenEmotion,newComment,isDisabled);
+  const allCommentsTempalte=(commentss)=>createAllCommentsTemplate(commentss,isDisabled,isDeleating);
 
+
+  console.log(comments);
   return (`<section class="film-details">
 <form class="film-details__inner" action="" method="get">
   <div class="film-details__top-container">
@@ -133,7 +136,7 @@ const createNewPopupTemplate = (feature) => {
       <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
       <ul class="film-details__comments-list">
-      ${comments.map(createAllCommentsTemplate).join('')}
+      ${comments.map(allCommentsTempalte).join('')}
       </ul>
       ${newCommentTempalte}
 
@@ -159,13 +162,11 @@ export class NewPopupView extends AbstractStatefulView {
     this.updateElement({comments:comments});
   }
 
-  deleateComment() {
-    super.removeElement();
-  }
-
   static parseFeaturesToState = (feature) => ({...feature,
     chosenEmotion: null,
-    newComment:''
+    newComment:'',
+    isDeleating:false,
+    isDisabled:false,
   });
 
   static parseStateToFeatures = (state) => {

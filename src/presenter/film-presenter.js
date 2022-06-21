@@ -13,7 +13,6 @@ export default class FilmPresenter {
   #commentModel=null;
   #featureComponent=null;
   #popupComponent=null;
-  #popupComments=null;
   #changeData = null;
   #handleOpenPopup=null;
 
@@ -28,7 +27,6 @@ export default class FilmPresenter {
 
   init = (task) => {
     this.#task = task;
-    // this.#popupComments=popupComments;
     const prevFeatureComponent=this.#featureComponent;
     this.#featureComponent= new NewFilmCardView(task);
     this.#featureComponent.setClickPopupOpener(()=>{
@@ -64,6 +62,31 @@ export default class FilmPresenter {
       this.#onCloseButtonClick();
     }
   };
+
+  setAdding = () => {
+    this.#popupComponent.updateElement({
+      isDisabled: true,
+    });
+  };
+
+  setDeleating = () => {
+    this.#popupComponent.updateElement({
+      isDeleating: true,
+    });
+  };
+
+  setAborting = () => {
+
+    const resetFormState = () => {
+      this.#popupComponent.updateElement({
+        isDisabled: false,
+        isDeleating: false,
+      });
+    };
+
+    this.#popupComponent.shake(resetFormState);
+  };
+
 
   #renderPopup() {
     this.#handleOpenPopup();

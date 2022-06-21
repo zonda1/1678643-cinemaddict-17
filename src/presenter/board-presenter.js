@@ -12,8 +12,14 @@ import {sortDateDown,sortRatingDown} from '../utils.js';
 import { SortType,UserAction,UpdateType,FilterType} from '../const/const.js';
 import {filter}  from '../mock/filter';
 import LoadingView from '../view/loading-view.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 const TASK_COUNT_PER_STEP = 5;
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 const siteMainElement=document.querySelector('.main');
 
@@ -33,6 +39,7 @@ export class BoardPresenter {
   #noFeatureComponent=null;
   #filmPresenter=new Map();
   #isLoading = true;
+  #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
 
   #renderedFeatureCount = TASK_COUNT_PER_STEP;
 
@@ -105,7 +112,7 @@ export class BoardPresenter {
     const filmPresenter =this.#filmPresenter.has(task.id)?this.#filmPresenter.get(task.id): new FilmPresenter(this.filmsListContainer.element,this.#commentModel,this.#handleViewAction,this.#handleOpenPopup);
     filmPresenter.init(task);
     this.#filmPresenter.set(task.id,filmPresenter);
-    // console.log(comments);
+    console.log(filmPresenter);
   }
 
   #clearFeatureList = ({resetRenderedTaskCount = false} = {}) => {
@@ -176,23 +183,35 @@ export class BoardPresenter {
   // };
 
   //Новый метод-обработчик пользовательского действия
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = async (actionType, updateType, update) => {
     // console.log(actionType, updateType, update);
     // Здесь будем вызывать обновление модели.
     // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
     // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
     // update - обновленные данные
+    this.#uiBlocker.block();
     switch (actionType) {
       case UserAction.UPDATE_TASK:
         this.#featureModel.updateItem(updateType,  update);
         break;
       case UserAction.ADD_COMMENT:
-        this.#commentModel.addComment(updateType, update);
+        this.#filmPresenter.get(update.idFilm).setAdding();
+        try {
+          this.#commentModel.addComment(updateType, update);
+        } catch (error) {
+          this.#filmPresenter.setAborting();
+        }
         break;
       case UserAction.DELETE_COMMENT:
-        this.#commentModel.deleateComment(updateType,  update);
+        this.#filmPresenter.get(update.id).setDeleating();
+        try {
+          this.#commentModel.deleateComment(updateType,  update);
+        } catch (error) {
+          this.#filmPresenter.setAborting();
+        }
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
