@@ -112,7 +112,7 @@ export class BoardPresenter {
     const filmPresenter =this.#filmPresenter.has(task.id)?this.#filmPresenter.get(task.id): new FilmPresenter(this.filmsListContainer.element,this.#commentModel,this.#handleViewAction,this.#handleOpenPopup);
     filmPresenter.init(task);
     this.#filmPresenter.set(task.id,filmPresenter);
-    console.log(filmPresenter);
+    // console.log(filmPresenter);
   }
 
   #clearFeatureList = ({resetRenderedTaskCount = false} = {}) => {
@@ -199,7 +199,8 @@ export class BoardPresenter {
         try {
           this.#commentModel.addComment(updateType, update);
         } catch (error) {
-          this.#filmPresenter.setAborting();
+          this.#filmPresenter.get(update.idFilm).setAborting();
+          // throw new Error('Some problem with server');
         }
         break;
       case UserAction.DELETE_COMMENT:
@@ -207,7 +208,8 @@ export class BoardPresenter {
         try {
           this.#commentModel.deleateComment(updateType,  update);
         } catch (error) {
-          this.#filmPresenter.setAborting();
+          this.#filmPresenter.get(update.id).setAborting();
+          // throw new Error('Some problem with server');
         }
         break;
     }

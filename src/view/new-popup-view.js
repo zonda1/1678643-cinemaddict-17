@@ -2,6 +2,7 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import {humanizeWholeDate,humanizeWholeDateWithTime,convertIntoHours} from '../utils.js';
 import { EMOTIONS } from '../const/const';
+import he from 'he';
 
 //Шаблон для рендеринга эмодзи в виде списка радиокнопок
 const createNewEmotionTemplate=(chosenEmotion)=>EMOTIONS.map((emotion)=>`
@@ -19,7 +20,7 @@ ${(chosenEmotion!==undefined && chosenEmotion!==null )? `<img src="./images/emoj
 </div>
 
 <label class="film-details__comment-label">
-  <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" ${isDisabled?'disabled':''} >${newComment}</textarea>
+  <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" ${isDisabled?'disabled':''} >${he.encode(newComment)}</textarea>
 </label>
 
 <div class="film-details__emoji-list">
@@ -268,7 +269,7 @@ export class NewPopupView extends AbstractStatefulView {
     evt.preventDefault();
     const oldScrollPosition=this.element.scrollTop;
     this.updateElement({
-      newComment: evt.currentTarget.value
+      newComment: he.encode(evt.currentTarget.value)
     });
     this.element.scrollTop=oldScrollPosition;
   };
