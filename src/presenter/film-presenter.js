@@ -2,9 +2,7 @@ import {NewFilmCardView} from '../view/new-film-card-view.js';
 import {NewPopupView} from '../view/new-popup-view.js';
 import {render,replace,remove} from '../framework/render.js';
 import {UserAction,UpdateType} from '../const/const.js';
-// import FeaturesApiService from '../tasks-api-service.js';
-// import { AUTHORIZATION } from '../const/const.js';
-// import { END_POINT } from '../const/const.js';
+
 
 export default class FilmPresenter {
 
@@ -21,8 +19,6 @@ export default class FilmPresenter {
     this.#commentModel=commentModel;
     this.#changeData=changeData;
     this.#handleOpenPopup=handleOpenPopup;
-
-    // this.#commentModel.addObserver(this.#renderPopup);
   }
 
   init = (task) => {
@@ -69,13 +65,13 @@ export default class FilmPresenter {
     });
   };
 
-  setDeleating = () => {
+  setDeleating = (idComment) => {
     this.#popupComponent.updateElement({
-      isDeleating: true,
+      isDeleating: idComment,
     });
   };
 
-  setAborting = () => {
+  setAddAborting = () => {
 
     const resetFormState = () => {
       this.#popupComponent.updateElement({
@@ -87,14 +83,29 @@ export default class FilmPresenter {
     this.#popupComponent.shake(resetFormState);
   };
 
+  setDeleateAborting = (idComment) => {
+    this.#popupComponent.updateElement({
+      isDisabled: false,
+      isDeleating: false,
+      isShaking: idComment,
+    });
+
+    const resetFormState = () => {
+      this.#popupComponent.updateElement({
+        isShaking: false,
+      });
+    };
+    this.#popupComponent.commentShake(resetFormState);
+  };
+
+  setFilterAborting = () => {
+    this.#popupComponent.filterShake();
+  };
 
   #renderPopup() {
     this.#handleOpenPopup();
     this.#popupComponent=new NewPopupView(this.#task);
-
     document.body.append(this.#popupComponent.element);
-
-    // console.log(this.#popupComments);
     this.#commentModel.getCommentsForFilm(this.#task).then((comments)=>this.#popupComponent.setComments(comments));
     this.#popupComponent.setWatchlistClickHandler(this.#handleWatchlistClick);
     this.#popupComponent.setWatchedClickHandler(this.#handleWatchedClick);
@@ -151,7 +162,11 @@ export default class FilmPresenter {
   };
 
   //Колбэк для добавления комментария
-  #handleAddComment = (comment) => {
-    this.#changeData(UserAction.ADD_COMMENT, UpdateType.PATCH, comment);
+  #handleAddComment = async (comment) => {
+    if (comment.comment) {
+      this.#changeData(UserAction.ADD_COMMENT, UpdateType.PATCH, comment);
+    } else {
+      throw new Error('Invalid comment');
+    }
   };
 }
