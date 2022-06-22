@@ -1,8 +1,10 @@
-/* eslint-disable quotes */
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import {humanizeWholeDate,humanizeWholeDateWithTime,convertIntoHours} from '../utils.js';
 import { EMOTIONS } from '../const/const';
 import he from 'he';
+
+const SHAKE_CLASS_NAME = 'shake';
+const SHAKE_ANIMATION_TIMEOUT = 600;
 
 //Шаблон для рендеринга эмодзи в виде списка радиокнопок
 const createNewEmotionTemplate=(chosenEmotion)=>EMOTIONS.map((emotion)=>`
@@ -16,7 +18,7 @@ const createNewCommentTemplate=(chosenEmotion,newComment,isDisabled)=> (`
 <div class="film-details__new-comment">
 
 <div class="film-details__add-emoji-label">
-${(chosenEmotion!==undefined && chosenEmotion!==null )? `<img src="./images/emoji/${chosenEmotion}.png" width="30" height="30" alt="emoji">`:''}
+${chosenEmotion? `<img src="./images/emoji/${chosenEmotion}.png" width="30" height="30" alt="emoji">`:''}
 </div>
 
 <label class="film-details__comment-label">
@@ -30,11 +32,11 @@ ${(chosenEmotion!==undefined && chosenEmotion!==null )? `<img src="./images/emoj
 
 
 //Шаблон для рендеринга списка загружаемых коментов
-const createAllCommentsTemplate=(comments,isDeleating,isDisabled)=>{
+const createAllCommentsTemplate=(comments,isDisabled,isDeleating,isShaking)=>{
   const {id,comment,author,date,emotion}=comments;
   const commentDate=humanizeWholeDateWithTime(date);
 
-  return (`<li class="film-details__comment">
+  return (`<li class="film-details__comment ${isShaking===id?'shake':''}">
   <span class="film-details__comment-emoji">
     <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
   </span>
@@ -43,7 +45,7 @@ const createAllCommentsTemplate=(comments,isDeleating,isDisabled)=>{
     <p class="film-details__comment-info">
       <span class="film-details__comment-author">${author}</span>
       <span class="film-details__comment-day">${commentDate}</span>
-      <button class="film-details__comment-delete" data-id="${id}" ${isDisabled ? 'disabled' : ''}>${ isDeleating ? 'Deleting...' : 'Delete'}</button>
+      <button class="film-details__comment-delete" data-id="${id}" ${isDisabled ? 'disabled' : ''}>${ isDeleating===id ? 'Deleting...' : 'Delete'}</button>
     </p>
   </div>
 </li>
@@ -54,15 +56,13 @@ const createNewPopupTemplate = (feature) => {
   const {title,alternativeTitle,poster, description, runtime, genre,director,writers,actors,totalRating,ageRating} = feature.filmInfo;
   const {date}=feature.filmInfo.release;
   const {comments=[]}=feature;
-  const {chosenEmotion,newComment,isDisabled,isDeleating}=feature;
+  const {chosenEmotion,newComment,isDisabled,isDeleating,isShaking}=feature;
   const filmDate=humanizeWholeDate(date);
   const {watchlist,alreadyWatched:watched,favorite}=feature.userDetails;
   const isUserDetailActive=(detail)=> detail ? 'film-details__control-button--active': '';
   const newCommentTempalte=createNewCommentTemplate(chosenEmotion,newComment,isDisabled);
-  const allCommentsTempalte=(commentss)=>createAllCommentsTemplate(commentss,isDisabled,isDeleating);
+  const allCommentsTempalte=(commentss)=>createAllCommentsTemplate(commentss,isDisabled,isDeleating,isShaking);
 
-
-  console.log(comments);
   return (`<section class="film-details">
 <form class="film-details__inner" action="" method="get">
   <div class="film-details__top-container">
@@ -168,6 +168,8 @@ export class NewPopupView extends AbstractStatefulView {
     newComment:'',
     isDeleating:false,
     isDisabled:false,
+    isShaking:false,
+    comments:[]
   });
 
   static parseStateToFeatures = (state) => {
@@ -261,7 +263,6 @@ export class NewPopupView extends AbstractStatefulView {
 
   #commentDeleateClickHandler = (evt) => {
     evt.preventDefault();
-    // this._callback.deleateCommentClick(this._state);
     this._callback.deleateCommentClick({...this._state, idComment:evt.currentTarget.dataset.id});
   };
 
@@ -274,18 +275,23 @@ export class NewPopupView extends AbstractStatefulView {
     this.element.scrollTop=oldScrollPosition;
   };
 
-  #newCommentSubmit = (evt) => {
+  #newCommentSubmit = async(evt) => {
     if(evt.key==='Enter' && evt.ctrlKey){
       evt.preventDefault();
-      this._callback.formSubmit({
-        idFilm:this._state.id,
-        comment: this._state.newComment,
-        emotion: this._state.chosenEmotion
-      });
-      this.updateElement({
-        chosenEmotion:'',
-        newComment: ''
-      });
+      try {
+        await this._callback.formSubmit({
+          idFilm:this._state.id,
+          comment: this._state.newComment,
+          emotion: this._state.chosenEmotion
+        });
+
+        this.updateElement({
+          chosenEmotion:'',
+          newComment: ''
+        });
+      } catch (err) {
+        throw new Error('You need to pick an emotion');
+      }
     }
   };
 
@@ -293,6 +299,20 @@ export class NewPopupView extends AbstractStatefulView {
     evt.preventDefault();
     this._callback.click();
   };
+
+  commentShake(callback) {
+    setTimeout(() => {
+      callback?.();
+    }, 1000);
+  }
+
+  filterShake() {
+    const filtersContainer=this.element.querySelector('.film-details__controls');
+    filtersContainer.classList.add(SHAKE_CLASS_NAME);
+    setTimeout(() => {
+      filtersContainer.classList.remove(SHAKE_CLASS_NAME);
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
 }
 
 

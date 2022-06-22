@@ -13,7 +13,6 @@ export class FeatureModel extends Observable {
     try {
       const features = await this.#featuresApiService.features;
       this.#features = features.map(this.#adaptToClient);
-      // console.log(this.#features);
     } catch(err) {
       this.#features = [];
     }
@@ -22,7 +21,6 @@ export class FeatureModel extends Observable {
 
   #adaptToClient = (feature) => {
     const adaptedFeature = {...feature,
-      // dueDate: feature['due_date'] !== null ? new Date(feature['due_date']) : feature['due_date'], // На клиенте дата хранится как экземпляр Date
       filmInfo:{...feature['film_info'],
         alternativeTitle:feature['film_info']['alternative_title'],
         totalRating:feature['film_info']['total_rating'],
@@ -33,7 +31,6 @@ export class FeatureModel extends Observable {
         watchingDate:feature['user_details']['watching_date']},
     };
 
-    // Ненужные ключи мы удаляем
     delete adaptedFeature['film_info'];
     delete adaptedFeature.filmInfo['alternative_title'];
     delete adaptedFeature.filmInfo['total_rating'];
@@ -71,5 +68,4 @@ export class FeatureModel extends Observable {
       throw new Error('Can\'t update feature');
     }
   };
-
 }

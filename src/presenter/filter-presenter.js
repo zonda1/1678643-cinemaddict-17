@@ -1,5 +1,5 @@
 import {FilterType, UpdateType} from '../const/const.js';
-import {filter}  from '../mock/filter';
+import {filter}  from '../filter/filter';
 import {render,replace,remove} from '../framework/render.js';
 import { NewFilterView } from '../view/new-filter-view.js';
 
@@ -15,7 +15,6 @@ export default class FilterPresenter {
     this.#filterModel = filterModel;
     this.#featureModel = featureModel;
 
-    //Подписки
     this.#featureModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
   }

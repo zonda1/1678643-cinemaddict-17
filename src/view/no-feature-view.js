@@ -10,7 +10,6 @@ const NoFeatureTextType={
 
 const createNoFeatureTemplate = (filterType) => {
   const noFeatureText=NoFeatureTextType[filterType];
-  // eslint-disable-next-line quotes
   return (`<h2 class="films-list__title">${noFeatureText}</h2>`);
 };
 
