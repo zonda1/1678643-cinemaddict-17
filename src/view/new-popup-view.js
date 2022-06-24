@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
-import {humanizeWholeDate,humanizeWholeDateWithTime,convertIntoHours} from '../utils.js';
+import {humanizeWholeDate,convertIntoHours,calculateTimeToNow,getDeclension} from '../utils.js';
 import { EMOTIONS } from '../const/const';
 import he from 'he';
 
@@ -34,7 +34,8 @@ ${chosenEmotion? `<img src="./images/emoji/${chosenEmotion}.png" width="30" heig
 //Шаблон для рендеринга списка загружаемых коментов
 const createAllCommentsTemplate=(comments,isDisabled,isDeleating,isShaking)=>{
   const {id,comment,author,date,emotion}=comments;
-  const commentDate=humanizeWholeDateWithTime(date);
+  // const commentDate=humanizeWholeDateWithTime(date);
+  const commentDate=calculateTimeToNow(date);
 
   return (`<li class="film-details__comment ${isShaking===id?'shake':''}">
   <span class="film-details__comment-emoji">
@@ -44,7 +45,7 @@ const createAllCommentsTemplate=(comments,isDisabled,isDeleating,isShaking)=>{
     <p class="film-details__comment-text">${comment}</p>
     <p class="film-details__comment-info">
       <span class="film-details__comment-author">${author}</span>
-      <span class="film-details__comment-day">${commentDate}</span>
+      <span class="film-details__comment-day">${getDeclension(commentDate)}</span>
       <button class="film-details__comment-delete" data-id="${id}" ${isDisabled ? 'disabled' : ''}>${ isDeleating===id ? 'Deleting...' : 'Delete'}</button>
     </p>
   </div>
