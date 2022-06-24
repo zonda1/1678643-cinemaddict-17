@@ -163,27 +163,6 @@ export class NewPopupView extends AbstractStatefulView {
     this.updateElement({comments:comments});
   }
 
-  static parseFeaturesToState = (feature) => ({...feature,
-    chosenEmotion: null,
-    newComment:'',
-    isDeleating:false,
-    isDisabled:false,
-    isShaking:false,
-    comments:[]
-  });
-
-  static parseStateToFeatures = (state) => {
-    const feature = {...state};
-
-    if (!feature.chosenEmotion) {
-      feature.chosenEmotion = null;
-    }
-
-    delete feature.chosenEmotion;
-
-    return feature;
-  };
-
   _restoreHandlers = () => {
     this.#setInnerHandlers();
     this.setClickPopupCloser(this._callback.click);
@@ -196,9 +175,7 @@ export class NewPopupView extends AbstractStatefulView {
 
   #setInnerHandlers = () => {
     const buttons=this.element.querySelectorAll('.film-details__emoji-item');
-    for (let i=0; i<buttons.length; i++) {
-      buttons[i].addEventListener('change',this.#emotionPickHandler);
-    }
+    buttons.forEach((button)=>button.addEventListener('change',this.#emotionPickHandler));
     this.element.querySelector('textarea').addEventListener('change',this.#newCommentInput);
   };
 
@@ -235,9 +212,7 @@ export class NewPopupView extends AbstractStatefulView {
   setCommentDeleateClickHandler = (callback) => {
     this._callback.deleateCommentClick = callback;
     const buttonDeleate=this.element.querySelectorAll('.film-details__comment-delete');
-    for (let i=0; i<buttonDeleate.length; i++) {
-      buttonDeleate[i].addEventListener('click',this.#commentDeleateClickHandler);
-    }
+    buttonDeleate.forEach((button)=>button.addEventListener('click',this.#commentDeleateClickHandler));
   };
 
   //Обработчик отправки формы
@@ -303,7 +278,7 @@ export class NewPopupView extends AbstractStatefulView {
   commentShake(callback) {
     setTimeout(() => {
       callback?.();
-    }, 1000);
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 
   filterShake() {
@@ -313,6 +288,24 @@ export class NewPopupView extends AbstractStatefulView {
       filtersContainer.classList.remove(SHAKE_CLASS_NAME);
     }, SHAKE_ANIMATION_TIMEOUT);
   }
+
+  static parseFeaturesToState = (feature) => ({...feature,
+    chosenEmotion: null,
+    newComment:'',
+    isDeleating:false,
+    isDisabled:false,
+    isShaking:false,
+    comments:[]
+  });
+
+  static parseStateToFeatures = (state) => {
+    const feature = {...state};
+    if (!feature.chosenEmotion) {
+      feature.chosenEmotion = null;
+    }
+    delete feature.chosenEmotion;
+    return feature;
+  };
 }
 
 

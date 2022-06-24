@@ -26,9 +26,7 @@ export default class FeaturesApiService extends ApiService {
       headers: new Headers({'Content-Type': 'application/json'}),
     });
 
-    const parsedResponse = await ApiService.parseResponse(response);
-
-    return parsedResponse;
+    return await ApiService.parseResponse(response);
   };
 
   addComment = async (feature) => {
@@ -39,9 +37,7 @@ export default class FeaturesApiService extends ApiService {
       headers: new Headers({'Content-Type': 'application/json'}),
     });
 
-    const parsedResponse = await ApiService.parseResponse(response);
-
-    return parsedResponse;
+    return await ApiService.parseResponse(response);
   };
 
   deleteComment = async (comment) => {
