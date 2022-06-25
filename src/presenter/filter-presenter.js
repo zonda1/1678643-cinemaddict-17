@@ -21,7 +21,6 @@ export default class FilterPresenter {
 
   get filters() {
     const features = this.#featureModel.features;
-
     return [
       {
         type: FilterType.ALL,
@@ -42,6 +41,16 @@ export default class FilterPresenter {
         type: FilterType.FAVORITES,
         name: 'Favorites',
         count: filter[FilterType.FAVORITES](features).length,
+      },
+      {
+        type: FilterType.TOP_RATED,
+        name: 'Top rated movies',
+        count: filter[FilterType.TOP_RATED](features).length,
+      },
+      {
+        type: FilterType.TOP_COMMENTED,
+        name: 'Top commented',
+        count: filter[FilterType.TOP_COMMENTED](features).length,
       },
     ];
   }

@@ -3,6 +3,8 @@ const FilterType = {
   WATCHLIST: 'watchlist',
   HISTORY: 'history',
   FAVORITES: 'favorites',
+  TOP_RATED: 'top_rated',
+  TOP_COMMENTED: 'top_commented',
 };
 
 const SortType = {

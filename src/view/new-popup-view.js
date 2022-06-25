@@ -258,7 +258,7 @@ export class NewPopupView extends AbstractStatefulView {
         await this._callback.formSubmit({
           idFilm:this._state.id,
           comment: this._state.newComment,
-          emotion: this._state.chosenEmotion
+          emotion: this._state.chosenEmotion,
         });
 
         this.updateElement({

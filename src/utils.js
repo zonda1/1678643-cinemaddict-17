@@ -29,7 +29,39 @@ const convertIntoHours = (mins) => {
   return `${hours}h ${minutes}m`;
 };
 
+function getMaxElements(S) {
+  const newMass = [];
+  let maxComments = 0;
+  let elMaxCom;
+
+  for (let i = 0; i < S.length; i++) {
+    if (S[i].comments.length > maxComments) {
+      elMaxCom = S[i];
+      maxComments=S[i].comments.length;
+      newMass.push(elMaxCom);
+    }
+    else {
+      if (S[i].comments.length === elMaxCom.comments.length) {
+        newMass.push(S[i]);
+      }
+    }
+  }
+  return shuffle(newMass);
+}
+
+function shuffle(arr){
+  let j, temp;
+  for(let i = arr.length - 1; i > 0; i--){
+    j = Math.floor(Math.random()*(i + 1));
+    temp = arr[j];
+    arr[j] = arr[i];
+    arr[i] = temp;
+  }
+  return arr;
+}
+
 const sortDateDown = (taskA, taskB) => dayjs(taskB.filmInfo.release.date).diff(dayjs(taskA.filmInfo.release.date));
 const sortRatingDown = (taskA, taskB) => taskB.filmInfo.totalRating-taskA.filmInfo.totalRating;
+const sortCommentsDown = (taskA, taskB) => taskB.comments.length-taskA.comments.length;
 
-export {humanizeOnlyYear,humanizeWholeDate,calculateTimeToNow,convertIntoHours,getDeclension,sortDateDown,sortRatingDown};
+export {humanizeOnlyYear,humanizeWholeDate,calculateTimeToNow,convertIntoHours,getDeclension,getMaxElements,shuffle,sortDateDown,sortRatingDown,sortCommentsDown};
